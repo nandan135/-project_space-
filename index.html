@@ -1,44 +1,36 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en" class="h-full bg-slate-950 text-slate-100">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AstraPlan // Orbital Weekly Task Commander</title>
-  <!-- Tailwind CSS -->
+  <title>AstraPlan: Cosmic Weekly Task Commander</title>
+
+  <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Lucide Icons -->
-  <script src="https://unpkg.com/lucide@latest"></script>
-  <!-- Google Fonts -->
+  
+  <!-- Font Awesome CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Google Fonts: Orbitron & JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Orbitron:wght@400;600;800;900&display=swap" rel="stylesheet">
 
   <script>
     tailwind.config = {
-      darkMode: 'class',
       theme: {
         extend: {
           fontFamily: {
-            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
-            mono: ['"Orbitron"', 'monospace'],
+            orbitron: ['Orbitron', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
           },
           colors: {
             space: {
-              950: '#040714',
-              900: '#070b1e',
-              850: '#0b112c',
-              800: '#0f173b',
-              700: '#192454',
-              border: 'rgba(56, 189, 248, 0.15)',
-              glow: 'rgba(0, 240, 255, 0.3)',
-            },
-            stellar: {
-              cyan: '#00f0ff',
-              neon: '#38bdf8',
-              purple: '#a855f7',
-              pink: '#ec4899',
-              amber: '#f59e0b',
-              emerald: '#10b981',
+              950: '#060913',
+              900: '#0b1021',
+              800: '#121a36',
+              700: '#1c2850',
+              600: '#27386e',
             }
           }
         }
@@ -47,1496 +39,1087 @@
   </script>
 
   <style>
-    /* Custom Scrollbar */
+    body {
+      font-family: 'JetBrains Mono', monospace;
+      background-color: #060913;
+      overflow-x: hidden;
+    }
+
+    /* Custom Scrollbars */
     ::-webkit-scrollbar {
       width: 6px;
       height: 6px;
     }
     ::-webkit-scrollbar-track {
-      background: rgba(7, 11, 30, 0.8);
+      background: rgba(11, 16, 33, 0.8);
     }
     ::-webkit-scrollbar-thumb {
       background: rgba(56, 189, 248, 0.3);
-      border-radius: 9999px;
+      border-radius: 4px;
     }
     ::-webkit-scrollbar-thumb:hover {
       background: rgba(56, 189, 248, 0.6);
     }
 
     /* Cosmic Glassmorphism */
-    .glass-panel {
-      background: rgba(11, 17, 44, 0.65);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
+    .cosmic-panel {
+      background: rgba(11, 16, 33, 0.75);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
       border: 1px solid rgba(56, 189, 248, 0.15);
-      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5), inset 0 0 12px 0 rgba(56, 189, 248, 0.05);
     }
 
-    .glass-panel-hover:hover {
+    .cosmic-panel-interactive {
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .cosmic-panel-interactive:hover {
       border-color: rgba(56, 189, 248, 0.4);
-      box-shadow: 0 12px 40px 0 rgba(0, 240, 255, 0.15), inset 0 0 16px 0 rgba(56, 189, 248, 0.1);
+      box-shadow: 0 0 20px rgba(56, 189, 248, 0.15);
     }
 
-    .glass-input {
-      background: rgba(7, 11, 30, 0.7);
-      border: 1px solid rgba(56, 189, 248, 0.2);
+    /* Glowing Effects */
+    .glow-cyan {
+      box-shadow: 0 0 15px rgba(6, 182, 212, 0.4);
     }
-    .glass-input:focus {
-      border-color: #00f0ff;
-      box-shadow: 0 0 15px rgba(0, 240, 255, 0.35);
-      outline: none;
+    .glow-pink {
+      box-shadow: 0 0 15px rgba(236, 72, 153, 0.4);
     }
-
-    /* Subtle HUD Pulse & Warp animations */
-    @keyframes pulse-glow {
-      0%, 100% { opacity: 0.4; transform: scale(1); }
-      50% { opacity: 0.8; transform: scale(1.02); }
-    }
-    .animate-pulse-glow {
-      animation: pulse-glow 4s ease-in-out infinite;
+    .glow-amber {
+      box-shadow: 0 0 15px rgba(245, 158, 11, 0.4);
     }
 
-    @keyframes scanline {
-      0% { transform: translateY(-100%); }
-      100% { transform: translateY(1000%); }
+    /* Saturn Planetary Ring SVG CSS */
+    .saturn-ring {
+      transform: rotate(-25deg);
+      transform-origin: center;
     }
-    .scanline {
-      position: absolute;
-      top: 0; left: 0; right: 0; height: 2px;
-      background: linear-gradient(to right, transparent, rgba(0, 240, 255, 0.4), transparent);
-      animation: scanline 8s linear infinite;
+
+    /* Starfield Background Canvas */
+    #starfield {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 0;
       pointer-events: none;
-    }
-
-    /* Drag target styles */
-    .drag-over {
-      border-color: #00f0ff !important;
-      background: rgba(0, 240, 255, 0.08) !important;
-      box-shadow: inset 0 0 20px rgba(0, 240, 255, 0.2) !important;
     }
   </style>
 </head>
-<body class="bg-space-950 text-slate-100 font-sans min-h-screen overflow-x-hidden selection:bg-stellar-cyan/30 selection:text-stellar-cyan relative">
+<body class="h-full flex flex-col relative text-slate-200">
 
-  <!-- Canvas Cosmic Starfield Background -->
-  <canvas id="cosmic-canvas" class="fixed inset-0 pointer-events-none z-0"></canvas>
+  <!-- Background Animated Starfield Canvas -->
+  <canvas id="starfield"></canvas>
 
-  <!-- Ambient Nebulae Gradients -->
-  <div class="fixed top-[-10%] left-[-10%] w-[50vw] h-[50vw] rounded-full bg-stellar-purple/10 blur-[120px] pointer-events-none z-0"></div>
-  <div class="fixed bottom-[-10%] right-[-10%] w-[50vw] h-[50vw] rounded-full bg-stellar-cyan/10 blur-[140px] pointer-events-none z-0"></div>
-  <div class="fixed top-[40%] left-[50%] -translate-x-1/2 -translate-y-1/2 w-[40vw] h-[40vw] rounded-full bg-stellar-pink/5 blur-[160px] pointer-events-none z-0"></div>
-
-  <!-- Top Command HUD -->
-  <header class="sticky top-0 z-30 border-b border-space-border/80 glass-panel">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+  <div class="relative z-10 flex flex-col min-h-screen">
+    
+    <!-- HEADER BAR -->
+    <header class="border-b border-slate-800/80 bg-space-950/90 backdrop-blur-md px-4 py-3 flex flex-wrap items-center justify-between gap-4 sticky top-0 z-40">
       
-      <!-- Brand & Mission Title -->
-      <div class="flex items-center space-x-3.5">
-        <div class="relative flex items-center justify-center w-11 h-11 rounded-xl bg-gradient-to-br from-stellar-cyan/20 to-stellar-purple/30 border border-stellar-cyan/40 shadow-lg shadow-stellar-cyan/10">
-          <i data-lucide="orbit" class="w-6 h-6 text-stellar-cyan animate-spin" style="animation-duration: 25s;"></i>
-          <span class="absolute -top-1 -right-1 w-2.5 h-2.5 bg-stellar-emerald rounded-full shadow-[0_0_8px_#10b981]"></span>
+      <!-- Logo & Title -->
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-600 to-blue-400 flex items-center justify-center text-slate-950 font-black text-xl shadow-lg shadow-cyan-500/20">
+          <i class="fa-solid fa-shuttle-space"></i>
         </div>
         <div>
-          <div class="flex items-center space-x-2">
-            <h1 class="font-mono text-lg sm:text-xl font-black tracking-wider uppercase text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-sky-100 to-purple-300">
-              AstraPlan
-            </h1>
-            <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-stellar-cyan/10 text-stellar-cyan border border-stellar-cyan/30 tracking-widest">
-              v3.8 ORBITAL
-            </span>
-          </div>
-          <p class="text-xs text-slate-400 font-mono tracking-tight flex items-center gap-1.5">
-            <span class="inline-block w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse"></span>
-            STARDATE <span id="stardate-display">2026.255</span> // FLIGHT PLANNER
-          </p>
+          <h1 class="font-orbitron font-extrabold text-lg sm:text-xl text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-sky-300 to-blue-500 tracking-wider">
+            ASTRAPLAN
+          </h1>
+          <p class="text-[10px] font-mono text-cyan-400/70 tracking-widest uppercase">Cosmic Task Commander</p>
         </div>
       </div>
 
-      <!-- Center: Orbit Week Selector -->
-      <div class="hidden md:flex items-center space-x-2 glass-panel px-3 py-1.5 rounded-xl border border-white/10">
-        <button id="btn-prev-week" class="p-1.5 rounded-lg text-slate-400 hover:text-stellar-cyan hover:bg-white/5 transition-colors" title="Previous Mission Cycle">
-          <i data-lucide="chevron-left" class="w-4 h-4"></i>
-        </button>
-        <div class="flex items-center space-x-2 px-2">
-          <i data-lucide="calendar" class="w-4 h-4 text-stellar-cyan"></i>
-          <span id="current-week-label" class="font-mono text-xs font-semibold text-slate-200 tracking-wide">
-            CYCLE 37 : SEP 07 - SEP 13
-          </span>
-        </div>
-        <button id="btn-next-week" class="p-1.5 rounded-lg text-slate-400 hover:text-stellar-cyan hover:bg-white/5 transition-colors" title="Next Mission Cycle">
-          <i data-lucide="chevron-right" class="w-4 h-4"></i>
-        </button>
-        <button id="btn-current-week" class="text-[11px] font-mono ml-2 px-2 py-1 rounded-md bg-white/5 hover:bg-stellar-cyan/20 text-slate-300 hover:text-stellar-cyan transition-all border border-white/10">
-          TODAY
-        </button>
-      </div>
-
-      <!-- Right HUD Controls & Actions -->
-      <div class="flex items-center space-x-2 sm:space-x-3">
-        <!-- Audio Telemetry Toggle -->
-        <button id="btn-toggle-audio" class="p-2 rounded-xl text-slate-400 hover:text-stellar-cyan glass-panel hover:border-stellar-cyan/40 transition-all" title="Toggle Cosmic Acoustic Feedback">
-          <i id="audio-icon" data-lucide="volume-2" class="w-4 h-4"></i>
-        </button>
-
-        <!-- View Switcher -->
-        <div class="flex items-center p-1 rounded-xl glass-panel border border-white/10">
-          <button id="view-week-btn" class="px-3 py-1 text-xs font-mono font-medium rounded-lg bg-stellar-cyan/20 text-stellar-cyan border border-stellar-cyan/40 transition-all flex items-center gap-1.5">
-            <i data-lucide="layout-grid" class="w-3.5 h-3.5"></i>
-            <span class="hidden sm:inline">WEEK</span>
-          </button>
-          <button id="view-today-btn" class="px-3 py-1 text-xs font-mono font-medium rounded-lg text-slate-400 hover:text-slate-200 transition-all flex items-center gap-1.5">
-            <i data-lucide="crosshair" class="w-3.5 h-3.5"></i>
-            <span class="hidden sm:inline">TODAY</span>
-          </button>
-          <button id="view-analytics-btn" class="px-3 py-1 text-xs font-mono font-medium rounded-lg text-slate-400 hover:text-slate-200 transition-all flex items-center gap-1.5">
-            <i data-lucide="activity" class="w-3.5 h-3.5"></i>
-            <span class="hidden sm:inline">METRICS</span>
-          </button>
-        </div>
-
-        <!-- Launch Task Button -->
-        <button id="btn-new-mission" class="relative group px-4 py-2 rounded-xl bg-gradient-to-r from-stellar-cyan to-blue-600 text-slate-950 font-mono font-bold text-xs sm:text-sm tracking-wide shadow-lg shadow-stellar-cyan/25 hover:shadow-stellar-cyan/40 active:scale-95 transition-all flex items-center space-x-2">
-          <i data-lucide="plus" class="w-4 h-4 text-slate-950"></i>
-          <span class="hidden sm:inline">DEPLOY MISSION</span>
-          <span class="sm:hidden">NEW</span>
-        </button>
-      </div>
-
-    </div>
-  </header>
-
-  <!-- Mission Telemetry Bar -->
-  <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-2 relative z-10">
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 mb-6">
-      
-      <!-- Card: Warp Completion Rate -->
-      <div class="glass-panel p-4 rounded-2xl flex items-center justify-between border-l-4 border-l-stellar-cyan">
-        <div>
-          <p class="text-[11px] font-mono uppercase tracking-widest text-slate-400">Mission Success</p>
-          <h3 id="stat-rate" class="text-2xl font-mono font-black text-white mt-0.5">0%</h3>
-          <div class="w-36 bg-white/10 h-1.5 rounded-full mt-2 overflow-hidden">
-            <div id="stat-rate-bar" class="h-full bg-gradient-to-r from-stellar-cyan to-stellar-emerald transition-all duration-700" style="width: 0%"></div>
-          </div>
-        </div>
-        <div class="w-12 h-12 rounded-xl bg-stellar-cyan/10 border border-stellar-cyan/20 flex items-center justify-center text-stellar-cyan">
-          <i data-lucide="shield-check" class="w-6 h-6"></i>
-        </div>
-      </div>
-
-      <!-- Card: Total Active Directives -->
-      <div class="glass-panel p-4 rounded-2xl flex items-center justify-between border-l-4 border-l-stellar-purple">
-        <div>
-          <p class="text-[11px] font-mono uppercase tracking-widest text-slate-400">Orbital Directives</p>
-          <div class="flex items-baseline space-x-2 mt-0.5">
-            <h3 id="stat-completed" class="text-2xl font-mono font-black text-white">0</h3>
-            <span class="text-xs text-slate-400 font-mono">/ <span id="stat-total">0</span> Total</span>
-          </div>
-          <p class="text-[11px] text-stellar-purple mt-1 font-mono flex items-center gap-1">
-            <span class="w-1.5 h-1.5 rounded-full bg-stellar-purple inline-block"></span>
-            <span id="stat-pending">0</span> Pending Launch
-          </p>
-        </div>
-        <div class="w-12 h-12 rounded-xl bg-stellar-purple/10 border border-stellar-purple/20 flex items-center justify-center text-stellar-purple">
-          <i data-lucide="compass" class="w-6 h-6"></i>
-        </div>
-      </div>
-
-      <!-- Card: Critical Priority Alert -->
-      <div class="glass-panel p-4 rounded-2xl flex items-center justify-between border-l-4 border-l-red-500">
-        <div>
-          <p class="text-[11px] font-mono uppercase tracking-widest text-slate-400">Critical Orbit (High)</p>
-          <h3 id="stat-critical" class="text-2xl font-mono font-black text-rose-400 mt-0.5">0</h3>
-          <p class="text-[11px] text-slate-400 mt-1 font-mono">Requires instant thruster burns</p>
-        </div>
-        <div class="w-12 h-12 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400">
-          <i data-lucide="flame" class="w-6 h-6 animate-pulse"></i>
-        </div>
-      </div>
-
-      <!-- Card: Stellar Energy XP -->
-      <div class="glass-panel p-4 rounded-2xl flex items-center justify-between border-l-4 border-l-stellar-amber">
-        <div>
-          <p class="text-[11px] font-mono uppercase tracking-widest text-slate-400">Cosmic Energy Earned</p>
-          <h3 id="stat-xp" class="text-2xl font-mono font-black text-stellar-amber mt-0.5">0 <span class="text-xs font-normal">GW</span></h3>
-          <p class="text-[11px] text-slate-400 mt-1 font-mono">Level <span id="stat-pilot-rank" class="text-stellar-amber font-semibold">Cadet</span> Pilot</p>
-        </div>
-        <div class="w-12 h-12 rounded-xl bg-stellar-amber/10 border border-stellar-amber/20 flex items-center justify-center text-stellar-amber">
-          <i data-lucide="zap" class="w-6 h-6"></i>
-        </div>
-      </div>
-
-    </div>
-
-    <!-- Filter & Search Command Strip -->
-    <div class="glass-panel p-3.5 rounded-2xl flex flex-wrap items-center justify-between gap-3 mb-6">
-      <!-- Search Input -->
-      <div class="relative flex-1 min-w-[240px]">
-        <i data-lucide="search" class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
-        <input id="mission-search" type="text" placeholder="Search mission name, sector, or directive..." 
-               class="w-full pl-10 pr-4 py-2 rounded-xl glass-input text-xs font-mono text-slate-100 placeholder-slate-500 focus:text-white transition-all">
-      </div>
-
-      <!-- Filter Controls -->
-      <div class="flex flex-wrap items-center gap-2">
-        <!-- Priority Filter -->
-        <div class="relative">
-          <select id="filter-priority" class="glass-input text-xs font-mono text-slate-300 rounded-xl px-3 py-2 pr-8 appearance-none cursor-pointer focus:text-stellar-cyan">
-            <option value="all">ALL ORBITS (Priority)</option>
-            <option value="critical">⚡ Critical / Warp</option>
-            <option value="high">🔴 High Orbit</option>
-            <option value="medium">🟡 Standard Orbit</option>
-            <option value="low">🟢 Low Orbit</option>
-          </select>
-          <i data-lucide="chevron-down" class="w-3.5 h-3.5 absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"></i>
-        </div>
-
-        <!-- Sector Filter -->
-        <div class="relative">
-          <select id="filter-sector" class="glass-input text-xs font-mono text-slate-300 rounded-xl px-3 py-2 pr-8 appearance-none cursor-pointer focus:text-stellar-cyan">
-            <option value="all">ALL SECTORS</option>
-            <option value="navigation">🚀 Navigation</option>
-            <option value="engineering">🛠️ Engineering</option>
-            <option value="science">🔬 Science / Research</option>
-            <option value="lifesupport">🌱 Life Support</option>
-            <option value="comms">📡 Deep Comms</option>
-          </select>
-          <i data-lucide="chevron-down" class="w-3.5 h-3.5 absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"></i>
-        </div>
-
-        <!-- Clear Filters Button -->
-        <button id="btn-reset-filters" class="p-2 rounded-xl glass-input text-slate-400 hover:text-stellar-cyan hover:border-stellar-cyan/40 transition-colors" title="Reset Filters">
-          <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
-        </button>
-      </div>
-    </div>
-  </section>
-
-  <!-- Main Operational Canvas Views -->
-  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20 relative z-10">
-
-    <!-- VIEW 1: WEEKLY PLANNER GRID -->
-    <div id="view-week-container" class="space-y-6">
-      
-      <!-- Top: Week Day Columns (Mon -> Sun) -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-7 gap-4">
+      <!-- Quick Action Toolbar -->
+      <div class="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end flex-wrap">
         
-        <!-- Day Columns Generated by JS (mon, tue, wed, thu, fri, sat, sun) -->
-        <div id="day-col-0" class="day-column glass-panel rounded-2xl p-3.5 flex flex-col min-h-[460px] transition-all duration-300" data-day-index="0"></div>
-        <div id="day-col-1" class="day-column glass-panel rounded-2xl p-3.5 flex flex-col min-h-[460px] transition-all duration-300" data-day-index="1"></div>
-        <div id="day-col-2" class="day-column glass-panel rounded-2xl p-3.5 flex flex-col min-h-[460px] transition-all duration-300" data-day-index="2"></div>
-        <div id="day-col-3" class="day-column glass-panel rounded-2xl p-3.5 flex flex-col min-h-[460px] transition-all duration-300" data-day-index="3"></div>
-        <div id="day-col-4" class="day-column glass-panel rounded-2xl p-3.5 flex flex-col min-h-[460px] transition-all duration-300" data-day-index="4"></div>
-        <div id="day-col-5" class="day-column glass-panel rounded-2xl p-3.5 flex flex-col min-h-[460px] transition-all duration-300" data-day-index="5"></div>
-        <div id="day-col-6" class="day-column glass-panel rounded-2xl p-3.5 flex flex-col min-h-[460px] transition-all duration-300" data-day-index="6"></div>
-
-      </div>
-
-      <!-- Bottom: Unscheduled Backlog / Cargo Bay -->
-      <div class="glass-panel rounded-2xl p-5 border border-dashed border-stellar-cyan/30">
-        <div class="flex items-center justify-between mb-4">
-          <div class="flex items-center space-x-2.5">
-            <div class="p-2 rounded-lg bg-stellar-purple/20 text-stellar-purple border border-stellar-purple/30">
-              <i data-lucide="package" class="w-4 h-4"></i>
-            </div>
-            <div>
-              <h2 class="font-mono text-sm font-bold text-white tracking-wider uppercase">Deep Cargo Bay // Unscheduled Backlog</h2>
-              <p class="text-xs text-slate-400 font-mono">Store secondary directives or drag tasks into orbital calendar days.</p>
-            </div>
-          </div>
-          <button onclick="openMissionModal('backlog')" class="text-xs font-mono px-3 py-1.5 rounded-lg bg-white/5 hover:bg-stellar-purple/20 text-slate-300 hover:text-stellar-purple border border-white/10 transition-all flex items-center gap-1.5">
-            <i data-lucide="plus" class="w-3.5 h-3.5"></i>
-            <span>STOW CARGO</span>
-          </button>
-        </div>
-
-        <!-- Cargo Droppable Container -->
-        <div id="backlog-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 min-h-[90px] p-3 rounded-xl bg-space-950/40 border border-white/5 transition-all" data-day-index="backlog">
-          <!-- Backlog tasks injected here -->
-        </div>
-      </div>
-
-    </div>
-
-    <!-- VIEW 2: TODAY FLIGHT LOG (Daily Focus) -->
-    <div id="view-today-container" class="hidden space-y-6">
-      <div class="glass-panel p-6 sm:p-8 rounded-3xl relative overflow-hidden border border-stellar-cyan/30">
-        <div class="scanline"></div>
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-white/10">
+        <!-- Station Clock -->
+        <div class="bg-space-900/90 border border-slate-800 rounded-xl px-3 py-1.5 flex items-center gap-2.5">
+          <i class="fa-regular fa-clock text-cyan-400 text-xs"></i>
           <div>
-            <div class="flex items-center gap-2">
-              <span class="px-2.5 py-0.5 rounded-full bg-stellar-cyan/20 text-stellar-cyan text-[11px] font-mono border border-stellar-cyan/30 animate-pulse">
-                TACTICAL FOCUS
-              </span>
-              <span id="today-view-date-str" class="text-xs font-mono text-slate-400">TODAY</span>
-            </div>
-            <h2 id="today-view-title" class="font-mono text-2xl sm:text-3xl font-black text-white mt-1 uppercase tracking-wide">
-              Flight Deck Command
-            </h2>
+            <div class="text-[8px] font-mono text-slate-400 uppercase tracking-widest">Station Time</div>
+            <div id="station-clock" class="font-mono text-xs text-cyan-300 font-bold tracking-wider">00:00:00 UTC</div>
           </div>
-          <div class="flex items-center gap-3">
-            <button onclick="openMissionModal('today')" class="px-4 py-2 rounded-xl bg-stellar-cyan text-space-950 font-mono text-xs font-bold shadow-lg shadow-stellar-cyan/25 hover:bg-cyan-300 transition-all flex items-center gap-2">
-              <i data-lucide="plus-circle" class="w-4 h-4"></i>
-              ADD TODAY DIRECTIVE
+        </div>
+
+        <!-- COSMIC YOUTUBE BACKGROUND RADIO CONTROLLER & QUICK LINK INPUT -->
+        <div class="flex items-center gap-2 bg-space-900/90 border border-cyan-500/30 rounded-xl p-1.5">
+          <!-- Play / Pause Button -->
+          <button id="yt-toggle-btn" onclick="window.toggleYoutubePlay()" class="w-8 h-8 rounded-lg bg-cyan-500/20 hover:bg-cyan-500/40 border border-cyan-400/50 text-cyan-300 transition flex items-center justify-center text-xs shrink-0" title="Play/Pause Background Radio">
+            <i id="yt-play-icon" class="fa-solid fa-play"></i>
+          </button>
+
+          <!-- Audio Sound FX Toggle (Speaker Button) -->
+          <button id="btn-audio-toggle" onclick="window.toggleAudio()" class="w-8 h-8 rounded-lg bg-space-800 border border-slate-700 hover:border-cyan-400 text-slate-300 hover:text-cyan-300 transition flex items-center justify-center shrink-0" title="Toggle Synthesizer Sound FX">
+            <i id="audio-icon" class="fa-solid fa-volume-high text-xs text-cyan-400"></i>
+          </button>
+
+          <!-- Songs Dropdown Right of Speaker Button -->
+          <div class="hidden md:flex flex-col">
+            <div class="flex items-center justify-between gap-2">
+              <span class="text-[8px] font-mono text-cyan-400 uppercase font-bold tracking-wider flex items-center gap-1">
+                <i class="fa-solid fa-radio text-[9px] animate-pulse"></i> COSMIC RADIO
+              </span>
+              <button onclick="window.toggleYoutubePanel()" class="text-[9px] font-mono text-slate-400 hover:text-cyan-300 underline">
+                <i class="fa-solid fa-sliders"></i> Tune
+              </button>
+            </div>
+            <select id="yt-preset-select" onchange="window.changeYoutubePreset(this.value)" class="bg-space-800 border border-slate-700 text-[10px] font-mono text-slate-200 rounded px-1.5 py-0.5 focus:outline-none focus:border-cyan-400 w-44">
+              <option value="yJg-Y5byMMw" selected>Warriyo - Mortals (ft. Laura Brehm)</option>
+              <option value="K4DyBUG242c">Cartoon - On & On</option>
+              <option value="3nQNiWdeH2Q">Janji - Heroes Tonight</option>
+              <option value="5wRWniH7WDA">Synthwave Cyberpunk Mix</option>
+              <option value="jfKfPfyJRdk">Lofi Hip Hop Beats</option>
+              <option value="2RDF-TtHtk4">NCS 24/7 Live Radio</option>
+            </select>
+          </div>
+
+          <!-- YouTube Link Input Space Right of Speaker Button -->
+          <div class="hidden sm:flex items-center gap-1 pl-1 border-l border-slate-800">
+            <input type="text" id="header-yt-url" placeholder="Paste YT link / ID..." onkeypress="if(event.key==='Enter') window.addCustomHeaderSong()" class="bg-space-950 border border-slate-800 rounded-lg px-2 py-1 text-[10px] font-mono text-slate-200 placeholder-slate-500 focus:outline-none focus:border-cyan-400 w-32 md:w-40">
+            <button onclick="window.addCustomHeaderSong()" class="px-2 py-1 bg-cyan-500/20 hover:bg-cyan-500/40 border border-cyan-400/50 text-cyan-300 font-mono text-[10px] rounded-lg transition flex items-center gap-1" title="Add & Play Song">
+              <i class="fa-solid fa-plus text-[9px]"></i>
+              <span class="hidden lg:inline">Play</span>
             </button>
           </div>
         </div>
 
-        <!-- Today Missions Grid -->
-        <div class="pt-6">
-          <div id="today-mission-list" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <!-- Dynamic Content -->
-          </div>
-          <div id="today-empty-state" class="hidden py-16 text-center">
-            <i data-lucide="check-circle-2" class="w-14 h-14 mx-auto text-stellar-cyan/40 mb-3 animate-bounce"></i>
-            <h4 class="font-mono text-base font-bold text-slate-200">Orbital Vectors Clear</h4>
-            <p class="text-xs text-slate-400 max-w-sm mx-auto mt-1 font-mono">No pending missions for this cycle. Relax in the observation module or deploy a new directive.</p>
-          </div>
-        </div>
+        <!-- New Task Trigger -->
+        <button onclick="window.openNewDirectiveModal()" class="px-3.5 py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-orbitron font-bold text-xs tracking-wider transition duration-200 shadow-lg shadow-cyan-500/25 flex items-center gap-1.5">
+          <i class="fa-solid fa-plus text-xs"></i>
+          <span class="hidden sm:inline">NEW DIRECTIVE</span>
+        </button>
+
       </div>
-    </div>
+    </header>
 
-    <!-- VIEW 3: TELEMETRY METRICS / ANALYTICS -->
-    <div id="view-analytics-container" class="hidden space-y-6">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        
-        <!-- Sector Distribution Card -->
-        <div class="glass-panel p-6 rounded-3xl border border-white/10">
-          <h3 class="font-mono text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2 mb-4">
-            <i data-lucide="pie-chart" class="w-4 h-4 text-stellar-cyan"></i>
-            Sector Resource Allocation
-          </h3>
-          <div id="sector-analytics-bars" class="space-y-4 font-mono text-xs">
-            <!-- Dynamic Sector progress bars -->
+    <!-- MAIN CONTENT CONTAINER -->
+    <main class="flex-1 p-4 lg:p-6 space-y-6 max-w-[1700px] mx-auto w-full">
+      
+      <!-- PLANETARY EXPEDITION TRAJECTORY BAR -->
+      <section class="cosmic-panel rounded-2xl p-4 sm:p-5 relative overflow-hidden">
+        <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-4">
+          <div>
+            <span class="text-[10px] font-mono text-cyan-400 uppercase tracking-widest font-bold flex items-center gap-1.5">
+              <i class="fa-solid fa-compass animate-spin text-cyan-400 text-xs"></i> Orbital Trajectory Engine
+            </span>
+            <h2 class="font-orbitron font-bold text-base sm:text-lg text-slate-100">WEEKLY CELESTIAL EXPEDITION</h2>
+          </div>
+
+          <!-- Overall Trajectory Status Badge -->
+          <div class="flex items-center gap-4 bg-space-900/90 border border-slate-800 rounded-xl px-4 py-2">
+            <div>
+              <div class="text-[9px] font-mono text-slate-400 uppercase">Mission Completion</div>
+              <div id="trajectory-percentage" class="font-orbitron font-bold text-cyan-300 text-sm sm:text-base">0% Complete</div>
+            </div>
+            <div class="h-8 w-px bg-slate-800"></div>
+            <div>
+              <div class="text-[9px] font-mono text-slate-400 uppercase">Resolved Directives</div>
+              <div id="trajectory-count" class="font-mono text-xs text-slate-200">0 / 0 Tasks</div>
+            </div>
           </div>
         </div>
 
-        <!-- Velocity & Efficiency Card -->
-        <div class="glass-panel p-6 rounded-3xl border border-white/10 flex flex-col justify-between">
-          <div>
-            <h3 class="font-mono text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2 mb-4">
-              <i data-lucide="gauge" class="w-4 h-4 text-stellar-purple"></i>
-              Orbital Velocity Breakdown
-            </h3>
-            <p class="text-xs text-slate-400 leading-relaxed font-mono">
-              Directives completed earn raw cosmic propellant. Keep mission completion rate above 80% to achieve Hyperdrive Flight certification.
-            </p>
-
-            <div class="grid grid-cols-2 gap-4 mt-6">
-              <div class="p-4 rounded-2xl bg-white/5 border border-white/5">
-                <span class="text-[10px] font-mono text-slate-400 uppercase">Subtasks Finished</span>
-                <p id="metric-subtasks" class="text-2xl font-mono font-bold text-slate-100 mt-1">0 / 0</p>
-              </div>
-              <div class="p-4 rounded-2xl bg-white/5 border border-white/5">
-                <span class="text-[10px] font-mono text-slate-400 uppercase">Weekly Velocity</span>
-                <p id="metric-velocity" class="text-2xl font-mono font-bold text-stellar-cyan mt-1">0 missions/wk</p>
-              </div>
+        <!-- Celestial Trajectory Track (Sun to Saturn) -->
+        <div class="relative py-4 px-2 sm:px-6">
+          <!-- Connective Track Line -->
+          <div class="absolute top-1/2 left-4 right-4 h-1 bg-gradient-to-r from-amber-500 via-cyan-500 via-indigo-500 to-amber-600 -translate-y-1/2 rounded-full opacity-40"></div>
+          
+          <!-- Animated Active Ship Indicator on Line -->
+          <div id="active-ship-marker" class="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 transition-all duration-700 ease-out z-20 pointer-events-none" style="left: 0%;">
+            <div class="w-7 h-7 rounded-full bg-cyan-400/30 border border-cyan-300 flex items-center justify-center glow-cyan">
+              <i class="fa-solid fa-rocket text-cyan-200 text-xs animate-bounce"></i>
             </div>
           </div>
 
-          <div class="mt-8 pt-4 border-t border-white/10 flex items-center justify-between text-xs font-mono text-slate-400">
-            <span>Hull Integrity: <strong class="text-stellar-emerald">100%</strong></span>
-            <span>Acoustic Telemetry: <strong class="text-stellar-cyan" id="audio-status-label">Active</strong></span>
+          <!-- Planets Container Grid (Sunday = Sun -> Saturday = Saturn) -->
+          <div class="grid grid-cols-7 relative z-10 text-center">
+            
+            <!-- Sunday: Sun -->
+            <div onclick="window.openBriefingModal('Sun')" class="cursor-pointer group flex flex-col items-center gap-1.5">
+              <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-tr from-amber-600 via-yellow-400 to-orange-500 flex items-center justify-center shadow-lg shadow-amber-500/40 border-2 border-yellow-200 group-hover:scale-110 transition duration-300">
+                <i class="fa-solid fa-sun text-slate-950 text-lg sm:text-xl"></i>
+              </div>
+              <span class="font-orbitron text-[10px] sm:text-xs font-bold text-amber-300 group-hover:text-amber-200">SUN</span>
+              <span class="text-[9px] text-slate-400 font-mono">Sun</span>
+              <span id="planet-count-Sun" class="text-[9px] bg-amber-950/80 text-amber-400 border border-amber-500/30 rounded-full px-2 py-0.5">0 Directives</span>
+            </div>
+
+            <!-- Monday: Mercury -->
+            <div onclick="window.openBriefingModal('Mercury')" class="cursor-pointer group flex flex-col items-center gap-1.5">
+              <div class="w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-gradient-to-tr from-slate-600 via-gray-400 to-zinc-300 flex items-center justify-center border border-slate-300 group-hover:scale-110 transition duration-300 shadow-md">
+                <i class="fa-solid fa-[#] text-xs opacity-0"></i>
+                <div class="w-4 h-4 rounded-full bg-slate-200"></div>
+              </div>
+              <span class="font-orbitron text-[10px] sm:text-xs font-bold text-slate-300 group-hover:text-white">MERCURY</span>
+              <span class="text-[9px] text-slate-400 font-mono">Mon</span>
+              <span id="planet-count-Mercury" class="text-[9px] bg-slate-900 text-slate-400 border border-slate-700 rounded-full px-2 py-0.5">0 Directives</span>
+            </div>
+
+            <!-- Tuesday: Venus -->
+            <div onclick="window.openBriefingModal('Venus')" class="cursor-pointer group flex flex-col items-center gap-1.5">
+              <div class="w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-gradient-to-tr from-amber-700 via-amber-500 to-yellow-600 flex items-center justify-center border border-amber-300 group-hover:scale-110 transition duration-300 shadow-md">
+                <div class="w-5 h-5 rounded-full bg-yellow-400/80"></div>
+              </div>
+              <span class="font-orbitron text-[10px] sm:text-xs font-bold text-amber-400 group-hover:text-amber-300">VENUS</span>
+              <span class="text-[9px] text-slate-400 font-mono">Tue</span>
+              <span id="planet-count-Venus" class="text-[9px] bg-amber-950/80 text-amber-400 border border-amber-800 rounded-full px-2 py-0.5">0 Directives</span>
+            </div>
+
+            <!-- Wednesday: Earth -->
+            <div onclick="window.openBriefingModal('Earth')" class="cursor-pointer group flex flex-col items-center gap-1.5">
+              <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-tr from-blue-600 via-teal-400 to-emerald-500 flex items-center justify-center shadow-lg shadow-cyan-500/30 border-2 border-cyan-200 group-hover:scale-110 transition duration-300">
+                <i class="fa-solid fa-earth-americas text-slate-950 text-base sm:text-lg"></i>
+              </div>
+              <span class="font-orbitron text-[10px] sm:text-xs font-bold text-cyan-300 group-hover:text-cyan-200">EARTH</span>
+              <span class="text-[9px] text-slate-400 font-mono">Wed</span>
+              <span id="planet-count-Earth" class="text-[9px] bg-cyan-950/80 text-cyan-400 border border-cyan-700 rounded-full px-2 py-0.5">0 Directives</span>
+            </div>
+
+            <!-- Thursday: Mars -->
+            <div onclick="window.openBriefingModal('Mars')" class="cursor-pointer group flex flex-col items-center gap-1.5">
+              <div class="w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-gradient-to-tr from-red-700 via-rose-500 to-orange-600 flex items-center justify-center border border-rose-300 group-hover:scale-110 transition duration-300 shadow-md shadow-rose-900/40">
+                <div class="w-4 h-4 rounded-full bg-red-400"></div>
+              </div>
+              <span class="font-orbitron text-[10px] sm:text-xs font-bold text-rose-400 group-hover:text-rose-300">MARS</span>
+              <span class="text-[9px] text-slate-400 font-mono">Thu</span>
+              <span id="planet-count-Mars" class="text-[9px] bg-rose-950/80 text-rose-400 border border-rose-800 rounded-full px-2 py-0.5">0 Directives</span>
+            </div>
+
+            <!-- Friday: Jupiter -->
+            <div onclick="window.openBriefingModal('Jupiter')" class="cursor-pointer group flex flex-col items-center gap-1.5">
+              <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-tr from-orange-700 via-amber-600 to-amber-300 flex items-center justify-center border-2 border-amber-200 group-hover:scale-110 transition duration-300 shadow-lg shadow-amber-700/40">
+                <div class="w-6 h-6 rounded-full bg-amber-200/40 border border-amber-100"></div>
+              </div>
+              <span class="font-orbitron text-[10px] sm:text-xs font-bold text-amber-300 group-hover:text-amber-200">JUPITER</span>
+              <span class="text-[9px] text-slate-400 font-mono">Fri</span>
+              <span id="planet-count-Jupiter" class="text-[9px] bg-amber-950/80 text-amber-400 border border-amber-800 rounded-full px-2 py-0.5">0 Directives</span>
+            </div>
+
+            <!-- Saturday: Saturn (with rings) -->
+            <div onclick="window.openBriefingModal('Saturn')" class="cursor-pointer group flex flex-col items-center gap-1.5">
+              <div class="relative w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center group-hover:scale-110 transition duration-300">
+                <!-- Outer Ring SVG -->
+                <svg class="absolute w-14 h-8 text-amber-300/60 saturn-ring pointer-events-none" viewBox="0 0 100 40">
+                  <ellipse cx="50" cy="20" rx="45" ry="12" fill="none" stroke="currentColor" stroke-width="4" />
+                </svg>
+                <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gradient-to-tr from-yellow-700 via-amber-500 to-yellow-200 border border-yellow-100 relative z-10"></div>
+              </div>
+              <span class="font-orbitron text-[10px] sm:text-xs font-bold text-yellow-300 group-hover:text-yellow-200">SATURN</span>
+              <span class="text-[9px] text-slate-400 font-mono">Sat</span>
+              <span id="planet-count-Saturn" class="text-[9px] bg-yellow-950/80 text-yellow-400 border border-yellow-800 rounded-full px-2 py-0.5">0 Directives</span>
+            </div>
+
           </div>
         </div>
+      </section>
 
-      </div>
-    </div>
+      <!-- QUICK TASK FILTER & COMMAND BAR -->
+      <section class="cosmic-panel rounded-2xl p-3 sm:p-4 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+        
+        <!-- Search & Filters -->
+        <div class="flex items-center gap-2 flex-1 flex-wrap">
+          <div class="relative flex-1 min-w-[200px]">
+            <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
+            <input type="text" id="task-search" oninput="window.renderTasks()" placeholder="Filter directive telemetries..." class="w-full bg-space-900 border border-slate-800 rounded-xl pl-9 pr-3 py-1.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-cyan-400 transition">
+          </div>
 
-  </main>
+          <select id="priority-filter" onchange="window.renderTasks()" class="bg-space-900 border border-slate-800 rounded-xl px-3 py-1.5 text-xs font-mono text-slate-300 focus:outline-none focus:border-cyan-400">
+            <option value="ALL">All Priorities</option>
+            <option value="WARP">Warp Speed (High)</option>
+            <option value="STANDARD">Standard Vector</option>
+            <option value="LOW">Low Gravity</option>
+          </select>
 
-  <!-- MISSION CREATION & EDIT MODAL -->
-  <div id="mission-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-space-950/80 backdrop-blur-md hidden transition-all duration-300">
-    <div class="glass-panel w-full max-w-lg rounded-3xl p-6 sm:p-7 border border-stellar-cyan/40 shadow-2xl relative">
-      
-      <!-- Close Button -->
-      <button id="modal-close-btn" class="absolute top-5 right-5 p-2 rounded-xl text-slate-400 hover:text-white hover:bg-white/10 transition-colors">
-        <i data-lucide="x" class="w-5 h-5"></i>
+          <select id="sector-filter" onchange="window.renderTasks()" class="bg-space-900 border border-slate-800 rounded-xl px-3 py-1.5 text-xs font-mono text-slate-300 focus:outline-none focus:border-cyan-400">
+            <option value="ALL">All Sectors</option>
+            <option value="COMMAND">Command</option>
+            <option value="RESEARCH">Research</option>
+            <option value="ENGINEERING">Engineering</option>
+            <option value="LOGISTICS">Logistics</option>
+          </select>
+        </div>
+
+        <!-- Direct Quick Add Input -->
+        <div class="flex items-center gap-2">
+          <input type="text" id="quick-task-title" placeholder="Quick Directive..." onkeypress="if(event.key==='Enter') window.quickAddTask()" class="bg-space-900 border border-slate-800 rounded-xl px-3 py-1.5 text-xs font-mono text-slate-200 focus:outline-none focus:border-cyan-400 w-full sm:w-48">
+          <button onclick="window.quickAddTask()" class="px-3 py-1.5 bg-space-800 hover:bg-space-700 border border-cyan-500/40 text-cyan-300 font-mono text-xs rounded-xl transition flex items-center gap-1">
+            <i class="fa-solid fa-bolt text-xs"></i> Add
+          </button>
+        </div>
+      </section>
+
+      <!-- 7-DAY WEEKLY GRID & DEEP CARGO BAY -->
+      <section class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 2xl:grid-cols-8 gap-4">
+        
+        <!-- Day Column Template (Rendered dynamically in JS or rendered directly) -->
+        <!-- Sunday -->
+        <div class="cosmic-panel rounded-2xl p-3 flex flex-col h-[520px]" id="col-Sunday">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-2 mb-3">
+            <div class="flex items-center gap-2">
+              <i class="fa-solid fa-sun text-amber-400 text-sm"></i>
+              <span class="font-orbitron font-bold text-xs text-amber-300">SUN</span>
+              <span class="text-[9px] text-slate-500 font-mono">Sun</span>
+            </div>
+            <span id="badge-Sunday" class="text-[9px] font-mono bg-space-900 border border-slate-800 text-slate-400 rounded-full px-2 py-0.5">0</span>
+          </div>
+          <div id="tasks-Sunday" class="flex-1 overflow-y-auto space-y-2 pr-1"></div>
+        </div>
+
+        <!-- Monday -->
+        <div class="cosmic-panel rounded-2xl p-3 flex flex-col h-[520px]" id="col-Monday">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-2 mb-3">
+            <div class="flex items-center gap-2">
+              <i class="fa-solid fa-moon text-slate-300 text-sm"></i>
+              <span class="font-orbitron font-bold text-xs text-slate-200">MERCURY</span>
+              <span class="text-[9px] text-slate-500 font-mono">Mon</span>
+            </div>
+            <span id="badge-Monday" class="text-[9px] font-mono bg-space-900 border border-slate-800 text-slate-400 rounded-full px-2 py-0.5">0</span>
+          </div>
+          <div id="tasks-Monday" class="flex-1 overflow-y-auto space-y-2 pr-1"></div>
+        </div>
+
+        <!-- Tuesday -->
+        <div class="cosmic-panel rounded-2xl p-3 flex flex-col h-[520px]" id="col-Tuesday">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-2 mb-3">
+            <div class="flex items-center gap-2">
+              <i class="fa-solid fa-shield-halved text-amber-400 text-sm"></i>
+              <span class="font-orbitron font-bold text-xs text-amber-400">VENUS</span>
+              <span class="text-[9px] text-slate-500 font-mono">Tue</span>
+            </div>
+            <span id="badge-Tuesday" class="text-[9px] font-mono bg-space-900 border border-slate-800 text-slate-400 rounded-full px-2 py-0.5">0</span>
+          </div>
+          <div id="tasks-Tuesday" class="flex-1 overflow-y-auto space-y-2 pr-1"></div>
+        </div>
+
+        <!-- Wednesday -->
+        <div class="cosmic-panel rounded-2xl p-3 flex flex-col h-[520px]" id="col-Wednesday">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-2 mb-3">
+            <div class="flex items-center gap-2">
+              <i class="fa-solid fa-earth-americas text-cyan-400 text-sm"></i>
+              <span class="font-orbitron font-bold text-xs text-cyan-300">EARTH</span>
+              <span class="text-[9px] text-slate-500 font-mono">Wed</span>
+            </div>
+            <span id="badge-Wednesday" class="text-[9px] font-mono bg-space-900 border border-slate-800 text-slate-400 rounded-full px-2 py-0.5">0</span>
+          </div>
+          <div id="tasks-Wednesday" class="flex-1 overflow-y-auto space-y-2 pr-1"></div>
+        </div>
+
+        <!-- Thursday -->
+        <div class="cosmic-panel rounded-2xl p-3 flex flex-col h-[520px]" id="col-Thursday">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-2 mb-3">
+            <div class="flex items-center gap-2">
+              <i class="fa-solid fa-circle text-rose-400 text-sm"></i>
+              <span class="font-orbitron font-bold text-xs text-rose-400">MARS</span>
+              <span class="text-[9px] text-slate-500 font-mono">Thu</span>
+            </div>
+            <span id="badge-Thursday" class="text-[9px] font-mono bg-space-900 border border-slate-800 text-slate-400 rounded-full px-2 py-0.5">0</span>
+          </div>
+          <div id="tasks-Thursday" class="flex-1 overflow-y-auto space-y-2 pr-1"></div>
+        </div>
+
+        <!-- Friday -->
+        <div class="cosmic-panel rounded-2xl p-3 flex flex-col h-[520px]" id="col-Friday">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-2 mb-3">
+            <div class="flex items-center gap-2">
+              <i class="fa-solid fa-atom text-amber-300 text-sm"></i>
+              <span class="font-orbitron font-bold text-xs text-amber-300">JUPITER</span>
+              <span class="text-[9px] text-slate-500 font-mono">Fri</span>
+            </div>
+            <span id="badge-Friday" class="text-[9px] font-mono bg-space-900 border border-slate-800 text-slate-400 rounded-full px-2 py-0.5">0</span>
+          </div>
+          <div id="tasks-Friday" class="flex-1 overflow-y-auto space-y-2 pr-1"></div>
+        </div>
+
+        <!-- Saturday -->
+        <div class="cosmic-panel rounded-2xl p-3 flex flex-col h-[520px]" id="col-Saturday">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-2 mb-3">
+            <div class="flex items-center gap-2">
+              <i class="fa-solid fa-ring text-yellow-400 text-sm"></i>
+              <span class="font-orbitron font-bold text-xs text-yellow-300">SATURN</span>
+              <span class="text-[9px] text-slate-500 font-mono">Sat</span>
+            </div>
+            <span id="badge-Saturday" class="text-[9px] font-mono bg-space-900 border border-slate-800 text-slate-400 rounded-full px-2 py-0.5">0</span>
+          </div>
+          <div id="tasks-Saturday" class="flex-1 overflow-y-auto space-y-2 pr-1"></div>
+        </div>
+
+        <!-- CARGO BAY (Backlog/Unscheduled) -->
+        <div class="cosmic-panel rounded-2xl p-3 flex flex-col h-[520px] border-dashed border-slate-700 bg-space-950/60" id="col-CargoBay">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-2 mb-3">
+            <div class="flex items-center gap-2">
+              <i class="fa-solid fa-box-archive text-indigo-400 text-sm"></i>
+              <span class="font-orbitron font-bold text-xs text-indigo-300">CARGO BAY</span>
+            </div>
+            <span id="badge-CargoBay" class="text-[9px] font-mono bg-space-900 border border-slate-800 text-slate-400 rounded-full px-2 py-0.5">0</span>
+          </div>
+          <div id="tasks-CargoBay" class="flex-1 overflow-y-auto space-y-2 pr-1"></div>
+        </div>
+
+      </section>
+    </main>
+  </div>
+
+  <!-- MODAL 1: PLANETARY MISSION TELEMETRY BRIEFING & STOPWATCH -->
+  <div id="briefing-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+    <div class="cosmic-panel w-full max-w-2xl rounded-2xl border border-cyan-500/30 p-6 shadow-2xl relative">
+      <button onclick="window.closeBriefingModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-lg">
+        <i class="fa-solid fa-xmark"></i>
       </button>
 
-      <!-- Modal Title -->
-      <div class="flex items-center space-x-3 mb-5">
-        <div class="p-2.5 rounded-xl bg-stellar-cyan/20 text-stellar-cyan border border-stellar-cyan/40">
-          <i id="modal-icon" data-lucide="rocket" class="w-5 h-5"></i>
+      <div id="briefing-content">
+        <!-- Dynamic planetary information injected here -->
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 2: YOUTUBE COSMIC BACKGROUND RADIO CONTROLLER -->
+  <div id="yt-radio-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+    <div class="cosmic-panel w-full max-w-lg rounded-2xl border border-cyan-500/30 p-5 shadow-2xl relative">
+      <button onclick="window.toggleYoutubePanel()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-lg">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-10 h-10 rounded-xl bg-red-600/20 border border-red-500/40 flex items-center justify-center text-red-500">
+          <i class="fa-solid fa-music text-xl"></i>
         </div>
         <div>
-          <h3 id="modal-heading" class="font-mono text-lg font-bold text-white uppercase tracking-wider">Log Mission Directive</h3>
-          <p class="text-xs text-slate-400 font-mono">Input coordinates and priority parameters.</p>
+          <h3 class="font-orbitron font-bold text-base text-cyan-300">NCS COSMIC RADIO HUB</h3>
+          <p class="text-[10px] font-mono text-slate-400">Stream official copyright-free NoCopyrightSounds tracks directly</p>
         </div>
       </div>
 
-      <!-- Form Inputs -->
-      <form id="mission-form" class="space-y-4">
-        <input type="hidden" id="task-id">
-
-        <!-- Title -->
+      <!-- Station Presets Grid -->
+      <div class="space-y-3 mb-4">
         <div>
-          <label class="block text-[11px] font-mono uppercase tracking-wider text-slate-300 mb-1.5">Mission Directives / Title *</label>
-          <input id="task-title" type="text" required placeholder="e.g. Recalibrate solar shielding arrays..." 
-                 class="w-full px-4 py-2.5 rounded-xl glass-input text-xs font-sans text-white placeholder-slate-500">
-        </div>
+          <label class="block text-xs font-mono text-slate-300 mb-1">SELECT NCS TRACK FREQUENCY</label>
+          <div class="grid grid-cols-2 gap-2">
+            <button onclick="window.changeYoutubePreset('yJg-Y5byMMw')" class="p-2 bg-space-900 hover:bg-space-800 border border-slate-700 rounded-xl text-left transition text-xs font-mono flex items-center gap-2">
+              <i class="fa-solid fa-wave-square text-emerald-400"></i>
+              <div>
+                <div class="text-slate-200 font-bold">Mortals</div>
+                <div class="text-[9px] text-slate-500">Warriyo (ft. Laura Brehm)</div>
+              </div>
+            </button>
 
-        <!-- Description / Notes -->
-        <div>
-          <label class="block text-[11px] font-mono uppercase tracking-wider text-slate-300 mb-1.5">Telemetry Notes & Details</label>
-          <textarea id="task-desc" rows="2" placeholder="Auxiliary operational details, frequencies, coordinates..." 
-                    class="w-full px-4 py-2 rounded-xl glass-input text-xs font-sans text-white placeholder-slate-500 resize-none"></textarea>
-        </div>
+            <button onclick="window.changeYoutubePreset('K4DyBUG242c')" class="p-2 bg-space-900 hover:bg-space-800 border border-slate-700 rounded-xl text-left transition text-xs font-mono flex items-center gap-2">
+              <i class="fa-solid fa-bolt text-cyan-400"></i>
+              <div>
+                <div class="text-slate-200 font-bold">On & On</div>
+                <div class="text-[9px] text-slate-500">Cartoon, Jéja (ft. D. Levi)</div>
+              </div>
+            </button>
 
-        <!-- Day Assignment & Priority Grid -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-          <!-- Day of Orbit -->
-          <div>
-            <label class="block text-[11px] font-mono uppercase tracking-wider text-slate-300 mb-1.5">Orbital Slot (Day)</label>
-            <div class="relative">
-              <select id="task-day" class="w-full glass-input text-xs font-mono text-slate-200 rounded-xl px-3.5 py-2.5 appearance-none cursor-pointer">
-                <option value="0">Monday // Orbit 1</option>
-                <option value="1">Tuesday // Orbit 2</option>
-                <option value="2">Wednesday // Orbit 3</option>
-                <option value="3">Thursday // Orbit 4</option>
-                <option value="4">Friday // Orbit 5</option>
-                <option value="5">Saturday // Orbit 6</option>
-                <option value="6">Sunday // Orbit 7</option>
-                <option value="backlog">📦 Cargo Bay Backlog</option>
-              </select>
-              <i data-lucide="chevron-down" class="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"></i>
-            </div>
+            <button onclick="window.changeYoutubePreset('3nQNiWdeH2Q')" class="p-2 bg-space-900 hover:bg-space-800 border border-slate-700 rounded-xl text-left transition text-xs font-mono flex items-center gap-2">
+              <i class="fa-solid fa-compact-disc text-pink-400"></i>
+              <div>
+                <div class="text-slate-200 font-bold">Heroes Tonight</div>
+                <div class="text-[9px] text-slate-500">Janji (ft. Johnning)</div>
+              </div>
+            </button>
+
+            <button onclick="window.changeYoutubePreset('5wRWniH7WDA')" class="p-2 bg-space-900 hover:bg-space-800 border border-slate-700 rounded-xl text-left transition text-xs font-mono flex items-center gap-2">
+              <i class="fa-solid fa-vr-cardboard text-purple-400"></i>
+              <div>
+                <div class="text-slate-200 font-bold">Synthwave Mix</div>
+                <div class="text-[9px] text-slate-500">Retrowave Space Beats</div>
+              </div>
+            </button>
+
+            <button onclick="window.changeYoutubePreset('jfKfPfyJRdk')" class="p-2 bg-space-900 hover:bg-space-800 border border-slate-700 rounded-xl text-left transition text-xs font-mono flex items-center gap-2">
+              <i class="fa-solid fa-headphones text-indigo-400"></i>
+              <div>
+                <div class="text-slate-200 font-bold">Lofi Radio</div>
+                <div class="text-[9px] text-slate-500">Chill Beats Stream</div>
+              </div>
+            </button>
+
+            <button onclick="window.changeYoutubePreset('2RDF-TtHtk4')" class="p-2 bg-space-900 hover:bg-space-800 border border-slate-700 rounded-xl text-left transition text-xs font-mono flex items-center gap-2">
+              <i class="fa-solid fa-tower-broadcast text-amber-400"></i>
+              <div>
+                <div class="text-slate-200 font-bold">NCS 24/7 Live</div>
+                <div class="text-[9px] text-slate-500">Non-Stop Radio</div>
+              </div>
+            </button>
           </div>
-
-          <!-- Priority Level -->
-          <div>
-            <label class="block text-[11px] font-mono uppercase tracking-wider text-slate-300 mb-1.5">Orbital Priority</label>
-            <div class="relative">
-              <select id="task-priority" class="w-full glass-input text-xs font-mono text-slate-200 rounded-xl px-3.5 py-2.5 appearance-none cursor-pointer">
-                <option value="low">🟢 Low Orbit (Standard)</option>
-                <option value="medium" selected>🟡 Mid Orbit (Important)</option>
-                <option value="high">🔴 High Orbit (Urgent)</option>
-                <option value="critical">⚡ Warp Speed (Critical)</option>
-              </select>
-              <i data-lucide="chevron-down" class="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"></i>
-            </div>
-          </div>
         </div>
 
-        <!-- Sector / Category -->
+        <!-- Custom URL Input -->
         <div>
-          <label class="block text-[11px] font-mono uppercase tracking-wider text-slate-300 mb-1.5">Mission Sector</label>
-          <div class="relative">
-            <select id="task-sector" class="w-full glass-input text-xs font-mono text-slate-200 rounded-xl px-3.5 py-2.5 appearance-none cursor-pointer">
-              <option value="navigation">🚀 Navigation & Astrogation</option>
-              <option value="engineering">🛠️ Engineering & Propulsion</option>
-              <option value="science">🔬 Scientific Discovery</option>
-              <option value="lifesupport">🌱 Life Support & Bio-dome</option>
-              <option value="comms">📡 Subspace Communications</option>
+          <label class="block text-xs font-mono text-slate-300 mb-1">CUSTOM YOUTUBE VIDEO URL / ID</label>
+          <div class="flex gap-2">
+            <input type="text" id="yt-custom-url" placeholder="Paste YouTube link or Video ID" class="flex-1 bg-space-900 border border-slate-700 rounded-xl px-3 py-2 text-xs font-mono text-slate-100 focus:outline-none focus:border-cyan-400">
+            <button onclick="window.loadCustomYoutubeUrl()" class="px-4 py-2 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-xl text-slate-950 font-orbitron font-bold text-xs hover:from-cyan-400 hover:to-blue-500 transition">
+              TUNE
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Embedded YouTube Video Iframe (Optimized parameters to prevent Error 153) -->
+      <div class="relative w-full aspect-video rounded-xl overflow-hidden border border-slate-800 bg-space-900 mb-4 shadow-inner">
+        <iframe id="yt-iframe" class="w-full h-full" src="https://www.youtube.com/embed/K4DyBUG242c?enablejsapi=1&rel=0" title="NCS Radio Stream" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+      </div>
+
+      <div class="flex items-center justify-between text-xs font-mono text-slate-400">
+        <span class="flex items-center gap-1.5"><i class="fa-solid fa-circle text-[8px] text-emerald-400 animate-ping"></i> NCS Radio Engine Active</span>
+        <button onclick="window.toggleYoutubePanel()" class="px-4 py-1.5 rounded-xl bg-space-800 text-slate-300 hover:bg-space-700 transition">
+          MINIMIZE
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 3: CREATE NEW DIRECTIVE MODAL -->
+  <div id="new-directive-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+    <div class="cosmic-panel w-full max-w-md rounded-2xl border border-cyan-500/30 p-6 shadow-2xl relative">
+      <button onclick="window.closeNewDirectiveModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-lg">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-9 h-9 rounded-xl bg-cyan-500/20 border border-cyan-400/40 flex items-center justify-center text-cyan-300">
+          <i class="fa-solid fa-plus text-base"></i>
+        </div>
+        <div>
+          <h3 class="font-orbitron font-bold text-base text-cyan-300">DISPATCH NEW DIRECTIVE</h3>
+          <p class="text-[10px] font-mono text-slate-400">Assign task vector to weekly orbital schedule</p>
+        </div>
+      </div>
+
+      <div class="space-y-4">
+        <div>
+          <label class="block text-xs font-mono text-slate-300 mb-1">DIRECTIVE TITLE *</label>
+          <input type="text" id="modal-task-title" placeholder="e.g., Calibrate Warp Thrusters" class="w-full bg-space-900 border border-slate-700 rounded-xl px-3 py-2 text-xs font-mono text-slate-100 focus:outline-none focus:border-cyan-400">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-mono text-slate-300 mb-1">ASSIGNED DAY</label>
+            <select id="modal-task-day" class="w-full bg-space-900 border border-slate-700 rounded-xl px-3 py-2 text-xs font-mono text-slate-100 focus:outline-none focus:border-cyan-400">
+              <option value="Sunday">Sunday (Sun)</option>
+              <option value="Monday">Monday (Mercury)</option>
+              <option value="Tuesday">Tuesday (Venus)</option>
+              <option value="Wednesday">Wednesday (Earth)</option>
+              <option value="Thursday">Thursday (Mars)</option>
+              <option value="Friday">Friday (Jupiter)</option>
+              <option value="Saturday">Saturday (Saturn)</option>
+              <option value="CargoBay">Cargo Bay (Backlog)</option>
             </select>
-            <i data-lucide="chevron-down" class="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"></i>
+          </div>
+
+          <div>
+            <label class="block text-xs font-mono text-slate-300 mb-1">PRIORITY CLASS</label>
+            <select id="modal-task-priority" class="w-full bg-space-900 border border-slate-700 rounded-xl px-3 py-2 text-xs font-mono text-slate-100 focus:outline-none focus:border-cyan-400">
+              <option value="WARP">Warp Speed (High)</option>
+              <option value="STANDARD" selected>Standard Vector</option>
+              <option value="LOW">Low Gravity</option>
+            </select>
           </div>
         </div>
 
-        <!-- Subtasks Checklist Section -->
-        <div>
-          <div class="flex items-center justify-between mb-1.5">
-            <label class="text-[11px] font-mono uppercase tracking-wider text-slate-300">Operational Subtasks</label>
-            <button type="button" id="btn-add-subtask" class="text-[10px] font-mono text-stellar-cyan hover:underline flex items-center gap-1">
-              <i data-lucide="plus" class="w-3 h-3"></i> Add Subtask
-            </button>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-mono text-slate-300 mb-1">SECTOR BADGE</label>
+            <select id="modal-task-sector" class="w-full bg-space-900 border border-slate-700 rounded-xl px-3 py-2 text-xs font-mono text-slate-100 focus:outline-none focus:border-cyan-400">
+              <option value="COMMAND">Command</option>
+              <option value="RESEARCH">Research</option>
+              <option value="ENGINEERING">Engineering</option>
+              <option value="LOGISTICS">Logistics</option>
+            </select>
           </div>
-          <div id="subtasks-container" class="space-y-2 max-h-36 overflow-y-auto pr-1">
-            <!-- Dynamic subtask inputs -->
+
+          <div>
+            <label class="block text-xs font-mono text-slate-300 mb-1">ESTIMATED TIME</label>
+            <input type="text" id="modal-task-time" placeholder="e.g., 45 mins" class="w-full bg-space-900 border border-slate-700 rounded-xl px-3 py-2 text-xs font-mono text-slate-100 focus:outline-none focus:border-cyan-400">
           </div>
         </div>
 
-        <!-- Actions -->
-        <div class="pt-4 flex items-center justify-between gap-3 border-t border-white/10">
-          <button type="button" id="btn-delete-task" class="hidden px-4 py-2.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 font-mono text-xs border border-rose-500/30 transition-all flex items-center gap-1.5">
-            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
-            ABORT
+        <div class="flex items-center justify-end gap-2 pt-2">
+          <button onclick="window.closeNewDirectiveModal()" class="px-4 py-2 rounded-xl bg-space-800 border border-slate-700 text-slate-300 hover:bg-space-700 text-xs font-mono transition">
+            CANCEL
           </button>
-          <div class="flex items-center space-x-2 ml-auto">
-            <button type="button" id="btn-cancel-modal" class="px-4 py-2.5 rounded-xl glass-input text-slate-300 hover:text-white font-mono text-xs transition-all">
-              DISMISS
+          <button onclick="window.saveNewDirective()" class="px-5 py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-orbitron font-bold text-xs shadow-lg shadow-cyan-500/25 transition">
+            DISPATCH
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // INITIAL SYSTEM STATE & PERSISTENCE
+    const DEFAULT_TASKS = [
+      { id: '1', title: 'System Diagnostics & Orbit Check', day: 'Sunday', priority: 'WARP', sector: 'COMMAND', completed: true, time: '30m' },
+      { id: '2', title: 'Review Deep Space Sensor Telemetry', day: 'Monday', priority: 'STANDARD', sector: 'RESEARCH', completed: true, time: '1h' },
+      { id: '3', title: 'Calibrate Solar Sail Array', day: 'Tuesday', priority: 'WARP', sector: 'ENGINEERING', completed: false, time: '45m' },
+      { id: '4', title: 'Re-supply Oxygen Tanks at Base', day: 'Wednesday', priority: 'STANDARD', sector: 'LOGISTICS', completed: false, time: '2h' },
+      { id: '5', title: 'Mars Surface Rover Software Patch', day: 'Thursday', priority: 'LOW', sector: 'RESEARCH', completed: false, time: '1.5h' },
+      { id: '6', title: 'Analyze Jovian Atmosphere Samples', day: 'Friday', priority: 'STANDARD', sector: 'RESEARCH', completed: false, time: '1h' },
+      { id: '7', title: 'Saturn Ring Gravitational Sweep', day: 'Saturday', priority: 'WARP', sector: 'COMMAND', completed: false, time: '3h' },
+      { id: '8', title: 'Archive Historical Starlight Logs', day: 'CargoBay', priority: 'LOW', sector: 'LOGISTICS', completed: false, time: '5h' }
+    ];
+
+    let tasks = JSON.parse(localStorage.getItem('astraplan_tasks')) || DEFAULT_TASKS;
+    let audioEnabled = true;
+
+    // WEB AUDIO API TELEMETRY SYNTHESIZER
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    function playBeep(freq = 440, type = 'sine', duration = 0.08) {
+      if (!audioEnabled || !audioCtx) return;
+      try {
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch (e) {
+        console.warn('Audio playback error', e);
+      }
+    }
+
+    window.toggleAudio = () => {
+      audioEnabled = !audioEnabled;
+      const icon = document.getElementById('audio-icon');
+      if (audioEnabled) {
+        icon.className = 'fa-solid fa-volume-high text-xs text-cyan-400';
+        playBeep(880, 'sine', 0.1);
+      } else {
+        icon.className = 'fa-solid fa-volume-xmark text-xs text-slate-500';
+      }
+    };
+
+    // YOUTUBE BACKGROUND RADIO ENGINE
+    let isYtPlaying = false;
+
+    window.toggleYoutubePanel = () => {
+      const modal = document.getElementById('yt-radio-modal');
+      modal.classList.toggle('hidden');
+      playBeep(600, 'sine', 0.1);
+    };
+
+    window.toggleYoutubePlay = () => {
+      const iframe = document.getElementById('yt-iframe');
+      const icon = document.getElementById('yt-play-icon');
+      const btn = document.getElementById('yt-toggle-btn');
+
+      if (!isYtPlaying) {
+        iframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
+        isYtPlaying = true;
+        if (icon) icon.className = 'fa-solid fa-pause text-cyan-300';
+        if (btn) btn.classList.add('glow-cyan');
+      } else {
+        iframe.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
+        isYtPlaying = false;
+        if (icon) icon.className = 'fa-solid fa-play text-cyan-300';
+        if (btn) btn.classList.remove('glow-cyan');
+      }
+      playBeep(520, 'sine', 0.1);
+    };
+
+    window.changeYoutubePreset = (videoId) => {
+      const select = document.getElementById('yt-preset-select');
+      if (select) select.value = videoId;
+
+      const iframe = document.getElementById('yt-iframe');
+      if (iframe) {
+        // Construct clean embed URL to bypass sandboxed iframe Error 153 restrictions
+        let embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&enablejsapi=1&rel=0&modestbranding=1`;
+        try {
+          if (window.location.protocol.startsWith('http')) {
+            embedUrl += `&origin=${encodeURIComponent(window.location.origin)}`;
+          }
+        } catch(e) {}
+        iframe.src = embedUrl;
+      }
+
+      isYtPlaying = true;
+      const icon = document.getElementById('yt-play-icon');
+      const btn = document.getElementById('yt-toggle-btn');
+      if (icon) icon.className = 'fa-solid fa-pause text-cyan-300';
+      if (btn) btn.classList.add('glow-cyan');
+      playBeep(880, 'sine', 0.1);
+    };
+
+    window.loadCustomYoutubeUrl = () => {
+      const input = document.getElementById('yt-custom-url');
+      let val = input ? input.value.trim() : '';
+      if (!val) return;
+
+      let videoId = val;
+      if (val.includes('v=')) {
+        videoId = val.split('v=')[1].split('&')[0];
+      } else if (val.includes('youtu.be/')) {
+        videoId = val.split('youtu.be/')[1].split('?')[0];
+      }
+
+      window.changeYoutubePreset(videoId);
+      if (input) input.value = '';
+    };
+
+    window.addCustomHeaderSong = () => {
+      const input = document.getElementById('header-yt-url');
+      if (!input) return;
+      let val = input.value.trim();
+      if (!val) return;
+
+      let videoId = val;
+      if (val.includes('v=')) {
+        videoId = val.split('v=')[1].split('&')[0];
+      } else if (val.includes('youtu.be/')) {
+        videoId = val.split('youtu.be/')[1].split('?')[0];
+      }
+
+      // Add to preset dropdown if not already existing
+      const select = document.getElementById('yt-preset-select');
+      if (select) {
+        let exists = false;
+        for (let i = 0; i < select.options.length; i++) {
+          if (select.options[i].value === videoId) {
+            exists = true;
+            break;
+          }
+        }
+        if (!exists) {
+          const newOpt = document.createElement('option');
+          newOpt.value = videoId;
+          newOpt.textContent = `Custom: ${videoId}`;
+          select.appendChild(newOpt);
+        }
+      }
+
+      window.changeYoutubePreset(videoId);
+      input.value = '';
+    };
+
+    // TASK RENDER & PERSISTENCE ENGINE
+    function saveTasks() {
+      localStorage.setItem('astraplan_tasks', JSON.stringify(tasks));
+      window.renderTasks();
+    }
+
+    window.renderTasks = () => {
+      const search = (document.getElementById('task-search')?.value || '').toLowerCase();
+      const prioFilter = document.getElementById('priority-filter')?.value || 'ALL';
+      const secFilter = document.getElementById('sector-filter')?.value || 'ALL';
+
+      const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'CargoBay'];
+      
+      const counts = { Sunday: 0, Monday: 0, Tuesday: 0, Wednesday: 0, Thursday: 0, Friday: 0, Saturday: 0, CargoBay: 0 };
+      const planetCounts = { Sun: 0, Mercury: 0, Venus: 0, Earth: 0, Mars: 0, Jupiter: 0, Saturn: 0 };
+      
+      let totalCount = 0;
+      let completedCount = 0;
+
+      days.forEach(day => {
+        const container = document.getElementById(`tasks-${day}`);
+        if (!container) return;
+        container.innerHTML = '';
+
+        const filtered = tasks.filter(t => {
+          if (t.day !== day) return false;
+          totalCount++;
+          if (t.completed) completedCount++;
+
+          // Planet badge counters
+          if (day === 'Sunday') planetCounts.Sun++;
+          if (day === 'Monday') planetCounts.Mercury++;
+          if (day === 'Tuesday') planetCounts.Venus++;
+          if (day === 'Wednesday') planetCounts.Earth++;
+          if (day === 'Thursday') planetCounts.Mars++;
+          if (day === 'Friday') planetCounts.Jupiter++;
+          if (day === 'Saturday') planetCounts.Saturn++;
+
+          if (search && !t.title.toLowerCase().includes(search)) return false;
+          if (prioFilter !== 'ALL' && t.priority !== prioFilter) return false;
+          if (secFilter !== 'ALL' && t.sector !== secFilter) return false;
+
+          return true;
+        });
+
+        counts[day] = filtered.length;
+
+        filtered.forEach(t => {
+          const card = document.createElement('div');
+          card.className = `cosmic-panel cosmic-panel-interactive rounded-xl p-2.5 flex flex-col gap-2 ${t.completed ? 'opacity-50 line-through' : ''}`;
+          
+          let prioColor = 'text-sky-400 bg-sky-950/60 border-sky-800';
+          if (t.priority === 'WARP') prioColor = 'text-rose-400 bg-rose-950/60 border-rose-800';
+          if (t.priority === 'LOW') prioColor = 'text-slate-400 bg-slate-900 border-slate-800';
+
+          card.innerHTML = `
+            <div class="flex items-start justify-between gap-2">
+              <button onclick="window.toggleTaskComplete('${t.id}')" class="mt-0.5 text-xs text-slate-400 hover:text-cyan-400 transition">
+                <i class="${t.completed ? 'fa-solid fa-circle-check text-emerald-400' : 'fa-regular fa-circle'}"></i>
+              </button>
+              <span class="text-xs text-slate-200 flex-1 leading-snug font-mono select-none">${t.title}</span>
+              <button onclick="window.deleteTask('${t.id}')" class="text-[10px] text-slate-500 hover:text-rose-400 transition">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </div>
+            <div class="flex items-center justify-between text-[9px] font-mono text-slate-400 pt-1 border-t border-slate-800/60">
+              <span class="px-1.5 py-0.5 rounded border ${prioColor}">${t.priority}</span>
+              <span class="text-slate-500">${t.sector}</span>
+              ${t.time ? `<span class="text-cyan-400/80"><i class="fa-regular fa-clock"></i> ${t.time}</span>` : ''}
+            </div>
+          `;
+          container.appendChild(card);
+        });
+
+        const badge = document.getElementById(`badge-${day}`);
+        if (badge) badge.textContent = counts[day];
+      });
+
+      // Update Planet Counter Badges
+      Object.keys(planetCounts).forEach(planet => {
+        const pBadge = document.getElementById(`planet-count-${planet}`);
+        if (pBadge) pBadge.textContent = `${planetCounts[planet]} Tasks`;
+      });
+
+      // Update Expedition Trajectory Progress
+      const percent = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
+      const percentageEl = document.getElementById('trajectory-percentage');
+      const countEl = document.getElementById('trajectory-count');
+      const shipEl = document.getElementById('active-ship-marker');
+
+      if (percentageEl) percentageEl.textContent = `${percent}% Completed`;
+      if (countEl) countEl.textContent = `${completedCount} / ${totalCount} Resolved`;
+      if (shipEl) shipEl.style.left = `${Math.min(percent, 96)}%`;
+    };
+
+    window.toggleTaskComplete = (id) => {
+      const task = tasks.find(t => t.id === id);
+      if (task) {
+        task.completed = !task.completed;
+        playBeep(task.completed ? 880 : 300, 'sine', 0.12);
+        saveTasks();
+      }
+    };
+
+    window.deleteTask = (id) => {
+      tasks = tasks.filter(t => t.id !== id);
+      playBeep(220, 'sawtooth', 0.1);
+      saveTasks();
+    };
+
+    window.quickAddTask = () => {
+      const input = document.getElementById('quick-task-title');
+      const title = input.value.trim();
+      if (!title) return;
+
+      const newTask = {
+        id: Date.now().toString(),
+        title,
+        day: 'Sunday',
+        priority: 'STANDARD',
+        sector: 'COMMAND',
+        completed: false,
+        time: '30m'
+      };
+
+      tasks.push(newTask);
+      input.value = '';
+      playBeep(700, 'sine', 0.1);
+      saveTasks();
+    };
+
+    // MODAL DIRECTIVE CREATION
+    window.openNewDirectiveModal = () => {
+      document.getElementById('new-directive-modal').classList.remove('hidden');
+      playBeep(500, 'sine', 0.1);
+    };
+
+    window.closeNewDirectiveModal = () => {
+      document.getElementById('new-directive-modal').classList.add('hidden');
+    };
+
+    window.saveNewDirective = () => {
+      const title = document.getElementById('modal-task-title').value.trim();
+      if (!title) return;
+
+      const day = document.getElementById('modal-task-day').value;
+      const priority = document.getElementById('modal-task-priority').value;
+      const sector = document.getElementById('modal-task-sector').value;
+      const time = document.getElementById('modal-task-time').value.trim() || '30m';
+
+      const newTask = {
+        id: Date.now().toString(),
+        title,
+        day,
+        priority,
+        sector,
+        completed: false,
+        time
+      };
+
+      tasks.push(newTask);
+      document.getElementById('modal-task-title').value = '';
+      window.closeNewDirectiveModal();
+      playBeep(880, 'sine', 0.15);
+      saveTasks();
+    };
+
+    // PLANETARY MISSION TELEMETRY BRIEFING MODAL
+    const PLANET_DATA = {
+      Sun: { name: 'THE SUN', type: 'Yellow Dwarf Star', dist: '0.00 AU', desc: 'Central star of the Solar System. Kickstart weekly operations with high-priority ignition tasks.', day: 'Sunday' },
+      Mercury: { name: 'MERCURY', type: 'Terrestrial Planet', dist: '0.39 AU', desc: 'Fastest orbital velocity around the sun. Ideal for swift communication and research directives.', day: 'Monday' },
+      Venus: { name: 'VENUS', type: 'Terrestrial Planet', dist: '0.72 AU', desc: 'Dense atmosphere with high thermal energy. Focus on tactical engineering and maintenance.', day: 'Tuesday' },
+      Earth: { name: 'EARTH', type: 'Home Base Planet', dist: '1.00 AU', desc: 'Command center headquarters. Execute primary mid-week logistics and team coordination.', day: 'Wednesday' },
+      Mars: { name: 'MARS', type: 'The Red Planet', dist: '1.52 AU', desc: 'Fronter outpost for exploration and innovation. Resolve deep tech and strategy challenges.', day: 'Thursday' },
+      Jupiter: { name: 'JUPITER', type: 'Gas Giant', dist: '5.20 AU', desc: 'Massive gravitational pull. Consolidate complex long-term research and heavy data tasks.', day: 'Friday' },
+      Saturn: { name: 'SATURN', type: 'Ringed Gas Giant', dist: '9.58 AU', desc: 'Spectacular planetary ring system. Complete weekly reviews, telemetry archives, and systemic wrap-ups.', day: 'Saturday' }
+    };
+
+    let stopwatchInterval = null;
+    let stopwatchSeconds = 0;
+
+    window.openBriefingModal = (planetKey) => {
+      const info = PLANET_DATA[planetKey];
+      if (!info) return;
+
+      const content = document.getElementById('briefing-content');
+      content.innerHTML = `
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-10 h-10 rounded-xl bg-cyan-500/20 border border-cyan-400/40 flex items-center justify-center text-cyan-300">
+            <i class="fa-solid fa-satellite text-lg"></i>
+          </div>
+          <div>
+            <span class="text-[10px] font-mono text-cyan-400 uppercase tracking-widest">Planetary Mission Telemetry</span>
+            <h3 class="font-orbitron font-bold text-lg text-slate-100">${info.name}</h3>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3 mb-4 font-mono text-xs">
+          <div class="bg-space-900 p-2.5 rounded-xl border border-slate-800">
+            <div class="text-[9px] text-slate-500 uppercase">Classification</div>
+            <div class="text-cyan-300 font-bold">${info.type}</div>
+          </div>
+          <div class="bg-space-900 p-2.5 rounded-xl border border-slate-800">
+            <div class="text-[9px] text-slate-500 uppercase">Orbital Distance</div>
+            <div class="text-slate-200 font-bold">${info.dist}</div>
+          </div>
+        </div>
+
+        <p class="text-xs font-mono text-slate-300 leading-relaxed mb-4">${info.desc}</p>
+
+        <!-- Tactical Stopwatch Controller -->
+        <div class="bg-space-900/90 border border-cyan-500/30 rounded-xl p-3 flex items-center justify-between gap-3">
+          <div>
+            <div class="text-[9px] font-mono text-cyan-400 uppercase font-bold">Tactical Mission Timer</div>
+            <div id="stopwatch-display" class="font-mono text-xl font-bold text-cyan-300">00:00</div>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="window.startStopwatch()" class="px-3 py-1.5 rounded-lg bg-cyan-500/20 hover:bg-cyan-500/40 border border-cyan-400 text-cyan-300 text-xs font-mono transition">
+              <i class="fa-solid fa-play"></i> START
             </button>
-            <button type="submit" id="btn-submit-task" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-stellar-cyan to-blue-600 text-space-950 font-mono font-bold text-xs shadow-lg shadow-stellar-cyan/25 hover:shadow-stellar-cyan/40 transition-all flex items-center gap-1.5">
-              <i data-lucide="save" class="w-4 h-4"></i>
-              CONFIRM DIRECTIVE
+            <button onclick="window.pauseStopwatch()" class="px-3 py-1.5 rounded-lg bg-space-800 hover:bg-space-700 border border-slate-700 text-slate-300 text-xs font-mono transition">
+              <i class="fa-solid fa-pause"></i> PAUSE
+            </button>
+            <button onclick="window.resetStopwatch()" class="px-3 py-1.5 rounded-lg bg-space-800 hover:bg-space-700 border border-slate-700 text-slate-400 text-xs font-mono transition">
+              <i class="fa-solid fa-rotate-right"></i> RESET
             </button>
           </div>
         </div>
-      </form>
+      `;
 
-    </div>
-  </div>
+      document.getElementById('briefing-modal').classList.remove('hidden');
+      playBeep(650, 'sine', 0.1);
+    };
 
-  <!-- Space Toast Notification Banner -->
-  <div id="toast-banner" class="fixed bottom-6 right-6 z-50 flex items-center space-x-3 px-4 py-3 rounded-2xl glass-panel border border-stellar-cyan/40 text-xs font-mono shadow-2xl translate-y-24 opacity-0 pointer-events-none transition-all duration-300">
-    <div id="toast-icon-box" class="p-2 rounded-xl bg-stellar-cyan/20 text-stellar-cyan">
-      <i id="toast-icon" data-lucide="radio" class="w-4 h-4"></i>
-    </div>
-    <div>
-      <p id="toast-title" class="font-bold text-white tracking-wide">TELEMETRY RECEIVED</p>
-      <p id="toast-msg" class="text-slate-400 text-[11px]">Mission parameters synchronized.</p>
-    </div>
-  </div>
+    window.closeBriefingModal = () => {
+      document.getElementById('briefing-modal').classList.add('hidden');
+    };
 
-  <!-- JAVASCRIPT LOGIC -->
-  <script>
-    // 1. Dynamic Interactive Cosmic Canvas (Stars, Dust, Shooting Stars)
-    const canvas = document.getElementById('cosmic-canvas');
+    window.startStopwatch = () => {
+      if (stopwatchInterval) return;
+      stopwatchInterval = setInterval(() => {
+        stopwatchSeconds++;
+        const mins = String(Math.floor(stopwatchSeconds / 60)).padStart(2, '0');
+        const secs = String(stopwatchSeconds % 60).padStart(2, '0');
+        const display = document.getElementById('stopwatch-display');
+        if (display) display.textContent = `${mins}:${secs}`;
+      }, 1000);
+    };
+
+    window.pauseStopwatch = () => {
+      clearInterval(stopwatchInterval);
+      stopwatchInterval = null;
+    };
+
+    window.resetStopwatch = () => {
+      window.pauseStopwatch();
+      stopwatchSeconds = 0;
+      const display = document.getElementById('stopwatch-display');
+      if (display) display.textContent = '00:00';
+    };
+
+    // STATION UTC CLOCK ENGINE
+    setInterval(() => {
+      const now = new Date();
+      const clockEl = document.getElementById('station-clock');
+      if (clockEl) {
+        clockEl.textContent = now.toUTCString().split(' ')[4] + ' UTC';
+      }
+    }, 1000);
+
+    // STARFIELD & NEBULA CANVAS ENGINE
+    const canvas = document.getElementById('starfield');
     const ctx = canvas.getContext('2d');
     let stars = [];
-    let shootingStars = [];
-    let mousePos = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
 
-    function initCanvas() {
+    function resizeCanvas() {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
+      initStars();
+    }
+
+    function initStars() {
       stars = [];
-      const starCount = Math.floor((canvas.width * canvas.height) / 3200);
-      
-      for (let i = 0; i < starCount; i++) {
+      const numStars = Math.floor((canvas.width * canvas.height) / 3000);
+      for (let i = 0; i < numStars; i++) {
         stars.push({
           x: Math.random() * canvas.width,
           y: Math.random() * canvas.height,
-          radius: Math.random() * 1.5 + 0.3,
-          alpha: Math.random() * 0.8 + 0.2,
-          speed: Math.random() * 0.05 + 0.01,
-          color: ['#ffffff', '#00f0ff', '#e0e7ff', '#a855f7', '#fbbf24'][Math.floor(Math.random() * 5)]
+          radius: Math.random() * 1.5,
+          alpha: Math.random(),
+          speed: Math.random() * 0.02 + 0.005
         });
       }
     }
 
-    function createShootingStar() {
-      if (Math.random() < 0.03 && shootingStars.length < 3) {
-        shootingStars.push({
-          x: Math.random() * canvas.width * 0.8,
-          y: Math.random() * (canvas.height * 0.4),
-          length: Math.random() * 80 + 40,
-          speed: Math.random() * 10 + 12,
-          angle: Math.PI / 4 + (Math.random() - 0.5) * 0.2,
-          opacity: 1
-        });
-      }
-    }
-
-    function drawCosmicSky() {
+    function animateStars() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = '#ffffff';
 
-      // Draw Twinkling Stars
       stars.forEach(star => {
-        star.alpha += (Math.random() - 0.5) * 0.02;
-        if (star.alpha < 0.1) star.alpha = 0.1;
-        if (star.alpha > 0.9) star.alpha = 0.9;
-
+        star.alpha += star.speed;
+        if (star.alpha > 1 || star.alpha < 0) {
+          star.speed = -star.speed;
+        }
+        ctx.globalAlpha = Math.abs(star.alpha);
         ctx.beginPath();
         ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
-        ctx.fillStyle = star.color;
-        ctx.globalAlpha = star.alpha;
         ctx.fill();
       });
 
-      // Draw and update shooting stars
-      createShootingStar();
-      for (let i = shootingStars.length - 1; i >= 0; i--) {
-        const s = shootingStars[i];
-        ctx.globalAlpha = s.opacity;
-        ctx.beginPath();
-        const tailX = s.x - Math.cos(s.angle) * s.length;
-        const tailY = s.y - Math.sin(s.angle) * s.length;
-
-        const grad = ctx.createLinearGradient(tailX, tailY, s.x, s.y);
-        grad.addColorStop(0, 'transparent');
-        grad.addColorStop(1, '#00f0ff');
-
-        ctx.strokeStyle = grad;
-        ctx.lineWidth = 2;
-        ctx.moveTo(tailX, tailY);
-        ctx.lineTo(s.x, s.y);
-        ctx.stroke();
-
-        s.x += Math.cos(s.angle) * s.speed;
-        s.y += Math.sin(s.angle) * s.speed;
-        s.opacity -= 0.02;
-
-        if (s.opacity <= 0 || s.x > canvas.width || s.y > canvas.height) {
-          shootingStars.splice(i, 1);
-        }
-      }
-
-      ctx.globalAlpha = 1.0;
-      requestAnimationFrame(drawCosmicSky);
+      requestAnimationFrame(animateStars);
     }
 
-    window.addEventListener('resize', initCanvas);
-    window.addEventListener('mousemove', (e) => {
-      mousePos.x = e.clientX;
-      mousePos.y = e.clientY;
-    });
+    window.addEventListener('resize', resizeCanvas);
 
-    // 2. Pure Web Audio Synthesizer for Space FX (Zero external audio URLs)
-    class CosmicSoundSynth {
-      constructor() {
-        this.ctx = null;
-        this.enabled = true;
-      }
-
-      initContext() {
-        if (!this.ctx) {
-          const AudioContext = window.AudioContext || window.webkitAudioContext;
-          this.ctx = new AudioContext();
-        }
-        if (this.ctx && this.ctx.state === 'suspended') {
-          this.ctx.resume();
-        }
-      }
-
-      playDeployBlip() {
-        if (!this.enabled) return;
-        this.initContext();
-        try {
-          const now = this.ctx.currentTime;
-          const osc = this.ctx.createOscillator();
-          const gain = this.ctx.createGain();
-
-          osc.type = 'sine';
-          osc.frequency.setValueAtTime(320, now);
-          osc.frequency.exponentialRampToValueAtTime(880, now + 0.12);
-
-          gain.gain.setValueAtTime(0.08, now);
-          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
-
-          osc.connect(gain);
-          gain.connect(this.ctx.destination);
-
-          osc.start(now);
-          osc.stop(now + 0.2);
-        } catch (e) {
-          console.warn('Audio synthesis issue:', e);
-        }
-      }
-
-      playCompleteChime() {
-        if (!this.enabled) return;
-        this.initContext();
-        try {
-          const now = this.ctx.currentTime;
-          const notes = [523.25, 659.25, 783.99, 1046.50]; // C, E, G, High C
-          notes.forEach((freq, idx) => {
-            const osc = this.ctx.createOscillator();
-            const gain = this.ctx.createGain();
-            const start = now + idx * 0.08;
-
-            osc.type = 'triangle';
-            osc.frequency.setValueAtTime(freq, start);
-
-            gain.gain.setValueAtTime(0.09, start);
-            gain.gain.exponentialRampToValueAtTime(0.0001, start + 0.35);
-
-            osc.connect(gain);
-            gain.connect(this.ctx.destination);
-
-            osc.start(start);
-            osc.stop(start + 0.4);
-          });
-        } catch (e) {
-          console.warn('Audio synthesis issue:', e);
-        }
-      }
-
-      playAbortHum() {
-        if (!this.enabled) return;
-        this.initContext();
-        try {
-          const now = this.ctx.currentTime;
-          const osc = this.ctx.createOscillator();
-          const gain = this.ctx.createGain();
-
-          osc.type = 'sawtooth';
-          osc.frequency.setValueAtTime(300, now);
-          osc.frequency.exponentialRampToValueAtTime(80, now + 0.25);
-
-          gain.gain.setValueAtTime(0.07, now);
-          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
-
-          osc.connect(gain);
-          gain.connect(this.ctx.destination);
-
-          osc.start(now);
-          osc.stop(now + 0.26);
-        } catch (e) {
-          console.warn('Audio synthesis issue:', e);
-        }
-      }
-    }
-
-    const soundSynth = new CosmicSoundSynth();
-
-    // 3. Application State & Storage Management
-    const SECTORS = {
-      navigation: { label: 'Navigation', icon: 'rocket', color: 'text-stellar-cyan', bg: 'bg-stellar-cyan/15', border: 'border-stellar-cyan/30' },
-      engineering: { label: 'Engineering', icon: 'wrench', color: 'text-stellar-amber', bg: 'bg-stellar-amber/15', border: 'border-stellar-amber/30' },
-      science: { label: 'Research', icon: 'atom', color: 'text-stellar-purple', bg: 'bg-stellar-purple/15', border: 'border-stellar-purple/30' },
-      lifesupport: { label: 'Life Support', icon: 'leaf', color: 'text-stellar-emerald', bg: 'bg-stellar-emerald/15', border: 'border-stellar-emerald/30' },
-      comms: { label: 'Comms', icon: 'radio', color: 'text-sky-400', bg: 'bg-sky-400/15', border: 'border-sky-400/30' }
+    // SYSTEM INITIALIZATION
+    window.onload = () => {
+      resizeCanvas();
+      animateStars();
+      window.renderTasks();
     };
-
-    const PRIORITIES = {
-      critical: { label: 'WARP SPEED', icon: 'zap', color: 'text-rose-400', border: 'border-rose-500/50', badgeBg: 'bg-rose-500/20 text-rose-300' },
-      high: { label: 'HIGH ORBIT', icon: 'alert-triangle', color: 'text-orange-400', border: 'border-orange-500/40', badgeBg: 'bg-orange-500/20 text-orange-300' },
-      medium: { label: 'STANDARD', icon: 'check-circle', color: 'text-amber-400', border: 'border-amber-500/40', badgeBg: 'bg-amber-500/20 text-amber-300' },
-      low: { label: 'LOW ORBIT', icon: 'arrow-down-circle', color: 'text-emerald-400', border: 'border-emerald-500/40', badgeBg: 'bg-emerald-500/20 text-emerald-300' }
-    };
-
-    const DAY_NAMES = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-
-    // In-memory mission store with comprehensive initial orbital data
-    let missionState = {
-      currentWeekOffset: 0, // 0 is current calendar week
-      activeView: 'week', // 'week', 'today', 'analytics'
-      filterPriority: 'all',
-      filterSector: 'all',
-      searchQuery: '',
-      missions: [
-        {
-          id: 'ms-1',
-          title: 'Calibrate Warp Containment Matrix',
-          desc: 'Run sub-space diagnostic on particle coils in sector 7.',
-          day: 0, // Monday
-          priority: 'critical',
-          sector: 'engineering',
-          completed: true,
-          subtasks: [
-            { text: 'Check plasma conduit seals', done: true },
-            { text: 'Align magnetic constriction coils', done: true }
-          ],
-          createdAt: Date.now() - 86400000 * 2
-        },
-        {
-          id: 'ms-2',
-          title: 'Analyze Exoplanet Spectrometry',
-          desc: 'Atmospheric scan for Kepler-452b orbital telemetry.',
-          day: 0, // Monday
-          priority: 'medium',
-          sector: 'science',
-          completed: false,
-          subtasks: [
-            { text: 'Filter methane noise spikes', done: true },
-            { text: 'Transcribe light curve data', done: false }
-          ],
-          createdAt: Date.now() - 86400000
-        },
-        {
-          id: 'ms-3',
-          title: 'Deep Space Relay Alignment',
-          desc: 'Adjust parabolic array for Earth-Mars direct transmission.',
-          day: 1, // Tuesday
-          priority: 'high',
-          sector: 'comms',
-          completed: false,
-          subtasks: [
-            { text: 'Synchronize quantum encryption keys', done: false }
-          ],
-          createdAt: Date.now()
-        },
-        {
-          id: 'ms-4',
-          title: 'Harvest Hydroponic Oxygen Pods',
-          desc: 'Rotate bio-moss nutrient feed in Sector Green.',
-          day: 2, // Wednesday
-          priority: 'low',
-          sector: 'lifesupport',
-          completed: false,
-          subtasks: [
-            { text: 'Check humidity sensor levels', done: true },
-            { text: 'Test CO2 reduction ratio', done: false }
-          ],
-          createdAt: Date.now()
-        },
-        {
-          id: 'ms-5',
-          title: 'Stow Asteroid Core Samples',
-          desc: 'Transfer tungsten-rich core containers from cargo airlock.',
-          day: 'backlog',
-          priority: 'medium',
-          sector: 'navigation',
-          completed: false,
-          subtasks: [],
-          createdAt: Date.now()
-        },
-        {
-          id: 'ms-6',
-          title: 'Stellar Astrogation Flight Check',
-          desc: 'Recalculate gravity slingshot trajectory past Jupiter.',
-          day: 4, // Friday
-          priority: 'high',
-          sector: 'navigation',
-          completed: false,
-          subtasks: [
-            { text: 'Verify orbital burn vector', done: false }
-          ],
-          createdAt: Date.now()
-        }
-      ]
-    };
-
-    // Calculate dates for the displayed week
-    function getWeekDays(offset = 0) {
-      const now = new Date();
-      // Set to Monday of the current week
-      const currentDay = now.getDay(); // 0 is Sun, 1 is Mon...
-      const distanceToMon = (currentDay + 6) % 7;
-      const monday = new Date(now);
-      monday.setDate(now.getDate() - distanceToMon + offset * 7);
-
-      const days = [];
-      for (let i = 0; i < 7; i++) {
-        const d = new Date(monday);
-        d.setDate(monday.getDate() + i);
-        days.push(d);
-      }
-      return days;
-    }
-
-    // Format Stardate Display (e.g., 2026.255)
-    function updateStardate() {
-      const now = new Date();
-      const startOfYear = new Date(now.getFullYear(), 0, 1);
-      const dayOfYear = Math.floor((now - startOfYear) / (1000 * 60 * 60 * 24));
-      const stardate = `${now.getFullYear()}.${String(dayOfYear).padStart(3, '0')}`;
-      const elem = document.getElementById('stardate-display');
-      if (elem) elem.textContent = stardate;
-    }
-
-    // 4. Rendering Weekly Grid and Missions
-    function renderApp() {
-      const weekDates = getWeekDays(missionState.currentWeekOffset);
-      const today = new Date();
-      const isCurrentWeek = missionState.currentWeekOffset === 0;
-
-      // Update Week Title Label
-      const monthNames = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
-      const startLabel = `${monthNames[weekDates[0].getMonth()]} ${String(weekDates[0].getDate()).padStart(2, '0')}`;
-      const endLabel = `${monthNames[weekDates[6].getMonth()]} ${String(weekDates[6].getDate()).padStart(2, '0')}`;
-      const cycleNum = 30 + (missionState.currentWeekOffset + 10);
-      document.getElementById('current-week-label').textContent = `CYCLE ${cycleNum} : ${startLabel} - ${endLabel}`;
-
-      // Filtered Missions List
-      const filteredMissions = missionState.missions.filter(m => {
-        if (missionState.filterPriority !== 'all' && m.priority !== missionState.filterPriority) return false;
-        if (missionState.filterSector !== 'all' && m.sector !== missionState.filterSector) return false;
-        if (missionState.searchQuery.trim() !== '') {
-          const q = missionState.searchQuery.toLowerCase();
-          const matchTitle = m.title.toLowerCase().includes(q);
-          const matchDesc = (m.desc || '').toLowerCase().includes(q);
-          const matchSector = m.sector.toLowerCase().includes(q);
-          if (!matchTitle && !matchDesc && !matchSector) return false;
-        }
-        return true;
-      });
-
-      // Clear Day Columns
-      for (let i = 0; i < 7; i++) {
-        const col = document.getElementById(`day-col-${i}`);
-        if (!col) continue;
-
-        const dateObj = weekDates[i];
-        const isToday = isCurrentWeek && (dateObj.getDate() === today.getDate() && dateObj.getMonth() === today.getMonth());
-        
-        // Day Missions
-        const dayMissions = filteredMissions.filter(m => m.day === i);
-        const completedDayCount = dayMissions.filter(m => m.completed).length;
-
-        col.innerHTML = `
-          <!-- Column Header -->
-          <div class="flex items-center justify-between pb-3 border-b border-white/10 mb-3">
-            <div>
-              <div class="flex items-center gap-1.5">
-                <h3 class="font-mono text-xs font-bold uppercase tracking-wider ${isToday ? 'text-stellar-cyan' : 'text-slate-200'}">
-                  ${DAY_NAMES[i].slice(0, 3)}
-                </h3>
-                ${isToday ? '<span class="w-1.5 h-1.5 rounded-full bg-stellar-cyan animate-ping"></span>' : ''}
-              </div>
-              <span class="text-[11px] font-mono text-slate-400">${monthNames[dateObj.getMonth()]} ${dateObj.getDate()}</span>
-            </div>
-            <div class="flex items-center space-x-1.5">
-              <span class="text-[10px] font-mono px-1.5 py-0.5 rounded-md bg-white/5 text-slate-400 border border-white/5">
-                ${completedDayCount}/${dayMissions.length}
-              </span>
-              <button onclick="openMissionModal(${i})" class="p-1 rounded-lg text-slate-400 hover:text-stellar-cyan hover:bg-white/10 transition-colors" title="Deploy directive on ${DAY_NAMES[i]}">
-                <i data-lucide="plus" class="w-3.5 h-3.5"></i>
-              </button>
-            </div>
-          </div>
-
-          <!-- Tasks Droppable Container -->
-          <div class="tasks-drop-zone flex-1 flex flex-col space-y-2.5 min-h-[300px]" data-day-index="${i}">
-            ${dayMissions.length === 0 ? `
-              <div class="flex-1 flex flex-col items-center justify-center text-center p-4 border border-dashed border-white/5 rounded-xl text-slate-600">
-                <i data-lucide="sparkles" class="w-5 h-5 mb-1.5 opacity-40"></i>
-                <span class="text-[10px] font-mono tracking-wide">NO DIRECTIVES</span>
-              </div>
-            ` : ''}
-          </div>
-        `;
-
-        // Inject missions into this day's container
-        const dropZone = col.querySelector('.tasks-drop-zone');
-        dayMissions.forEach(m => {
-          dropZone.appendChild(createMissionCardElement(m));
-        });
-      }
-
-      // Render Cargo Backlog
-      const backlogContainer = document.getElementById('backlog-container');
-      const backlogMissions = filteredMissions.filter(m => m.day === 'backlog');
-      backlogContainer.innerHTML = '';
-      if (backlogMissions.length === 0) {
-        backlogContainer.innerHTML = `
-          <div class="col-span-full py-6 text-center text-slate-500 font-mono text-xs flex items-center justify-center gap-2">
-            <i data-lucide="inbox" class="w-4 h-4 opacity-50"></i>
-            Cargo bay clear. Drag or stow unassigned missions here.
-          </div>
-        `;
-      } else {
-        backlogMissions.forEach(m => {
-          backlogContainer.appendChild(createMissionCardElement(m));
-        });
-      }
-
-      // Render Today View
-      renderTodayView(filteredMissions, isCurrentWeek, today);
-
-      // Update Analytics & Stats
-      updateTelemetryMetrics();
-
-      // Bind Drag & Drop Listeners
-      setupDragAndDrop();
-
-      // Refresh Lucide Icons
-      lucide.createIcons();
-    }
-
-    // Create DOM element for a task card
-    function createMissionCardElement(mission) {
-      const card = document.createElement('div');
-      card.className = `mission-card group relative p-3 rounded-xl glass-panel glass-panel-hover border ${
-        mission.completed ? 'opacity-60 border-white/5 bg-space-900/40' : 'border-white/10'
-      } cursor-grab active:cursor-grabbing transition-all select-none`;
-      card.draggable = true;
-      card.dataset.id = mission.id;
-
-      const sector = SECTORS[mission.sector] || SECTORS.navigation;
-      const priority = PRIORITIES[mission.priority] || PRIORITIES.medium;
-
-      // Subtask progress
-      const totalSub = (mission.subtasks || []).length;
-      const completedSub = (mission.subtasks || []).filter(s => s.done).length;
-
-      card.innerHTML = `
-        <!-- Top Status & Sector Badge -->
-        <div class="flex items-center justify-between gap-1 mb-2">
-          <div class="flex items-center space-x-1.5">
-            <span class="text-[9px] font-mono px-2 py-0.5 rounded-full ${sector.bg} ${sector.color} border ${sector.border} uppercase tracking-widest font-semibold flex items-center gap-1">
-              <i data-lucide="${sector.icon}" class="w-2.5 h-2.5"></i>
-              ${sector.label}
-            </span>
-            <span class="text-[9px] font-mono px-1.5 py-0.5 rounded-md ${priority.badgeBg} uppercase font-semibold flex items-center gap-0.5">
-              ${priority.label.split(' ')[0]}
-            </span>
-          </div>
-
-          <!-- Direct Actions -->
-          <div class="opacity-80 group-hover:opacity-100 flex items-center space-x-1">
-            <button onclick="event.stopPropagation(); toggleMissionComplete('${mission.id}')" 
-                    class="p-1 rounded-lg ${mission.completed ? 'bg-stellar-emerald/20 text-stellar-emerald' : 'text-slate-400 hover:text-stellar-emerald hover:bg-white/10'} transition-colors"
-                    title="${mission.completed ? 'Mark in progress' : 'Mark completed'}">
-              <i data-lucide="${mission.completed ? 'check-circle' : 'circle'}" class="w-4 h-4"></i>
-            </button>
-            <button onclick="event.stopPropagation(); editMissionModal('${mission.id}')" 
-                    class="p-1 rounded-lg text-slate-400 hover:text-stellar-cyan hover:bg-white/10 transition-colors"
-                    title="Edit parameters">
-              <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
-            </button>
-          </div>
-        </div>
-
-        <!-- Mission Title -->
-        <h4 class="font-sans text-xs font-semibold ${mission.completed ? 'line-through text-slate-500' : 'text-slate-100'} leading-snug mb-1">
-          ${escapeHtml(mission.title)}
-        </h4>
-
-        <!-- Description Snippet -->
-        ${mission.desc ? `
-          <p class="text-[11px] text-slate-400 line-clamp-2 leading-relaxed mb-2 font-mono">
-            ${escapeHtml(mission.desc)}
-          </p>
-        ` : ''}
-
-        <!-- Subtask Progress -->
-        ${totalSub > 0 ? `
-          <div class="mt-2 pt-2 border-t border-white/5 flex items-center justify-between text-[10px] font-mono text-slate-400">
-            <span class="flex items-center gap-1">
-              <i data-lucide="list-checks" class="w-3 h-3 text-stellar-cyan"></i>
-              ${completedSub}/${totalSub} steps
-            </span>
-            <div class="w-16 bg-white/10 h-1 rounded-full overflow-hidden">
-              <div class="h-full bg-stellar-cyan" style="width: ${(completedSub / totalSub) * 100}%"></div>
-            </div>
-          </div>
-        ` : ''}
-      `;
-
-      // Drag event bindings
-      card.addEventListener('dragstart', (e) => {
-        card.classList.add('opacity-40', 'scale-95');
-        e.dataTransfer.setData('text/plain', mission.id);
-        e.dataTransfer.effectAllowed = 'move';
-      });
-
-      card.addEventListener('dragend', () => {
-        card.classList.remove('opacity-40', 'scale-95');
-      });
-
-      return card;
-    }
-
-    // Render Today Tactical Deck
-    function renderTodayView(missions, isCurrentWeek, today) {
-      const todayList = document.getElementById('today-mission-list');
-      const emptyState = document.getElementById('today-empty-state');
-      const dateStrElem = document.getElementById('today-view-date-str');
-
-      const todayIndex = (today.getDay() + 6) % 7; // Convert Sun=0 to Mon=0...
-      dateStrElem.textContent = `${DAY_NAMES[todayIndex].toUpperCase()} // ${today.toLocaleDateString()}`;
-
-      // Today Missions
-      const todayTasks = missions.filter(m => m.day === todayIndex);
-
-      todayList.innerHTML = '';
-      if (todayTasks.length === 0) {
-        emptyState.classList.remove('hidden');
-        todayList.classList.add('hidden');
-      } else {
-        emptyState.classList.add('hidden');
-        todayList.classList.remove('hidden');
-        todayTasks.forEach(m => {
-          const taskCard = createMissionCardElement(m);
-          todayList.appendChild(taskCard);
-        });
-      }
-    }
-
-    // Drag & Drop Handling for Days and Backlog
-    function setupDragAndDrop() {
-      const dropTargets = document.querySelectorAll('.tasks-drop-zone, #backlog-container');
-
-      dropTargets.forEach(zone => {
-        zone.addEventListener('dragover', (e) => {
-          e.preventDefault();
-          e.dataTransfer.dropEffect = 'move';
-          zone.classList.add('drag-over');
-        });
-
-        zone.addEventListener('dragleave', () => {
-          zone.classList.remove('drag-over');
-        });
-
-        zone.addEventListener('drop', (e) => {
-          e.preventDefault();
-          zone.classList.remove('drag-over');
-          const missionId = e.dataTransfer.getData('text/plain');
-          const targetDay = zone.dataset.dayIndex === 'backlog' ? 'backlog' : parseInt(zone.dataset.dayIndex, 10);
-
-          const task = missionState.missions.find(m => m.id === missionId);
-          if (task && task.day !== targetDay) {
-            task.day = targetDay;
-            soundSynth.playDeployBlip();
-            showToast('VECTOR REASSIGNED', `Mission redirected to ${targetDay === 'backlog' ? 'Cargo Bay' : DAY_NAMES[targetDay]}`);
-            renderApp();
-          }
-        });
-      });
-    }
-
-    // 5. Mission Actions (Toggle Complete, Add, Edit, Delete)
-    function toggleMissionComplete(id) {
-      const mission = missionState.missions.find(m => m.id === id);
-      if (!mission) return;
-
-      mission.completed = !mission.completed;
-      if (mission.completed) {
-        soundSynth.playCompleteChime();
-        showToast('MISSION ACCOMPLISHED', `Directives for "${mission.title}" finalized.`);
-      } else {
-        soundSynth.playDeployBlip();
-        showToast('MISSION REACTIVATED', `Directive returned to pending orbital status.`);
-      }
-      renderApp();
-    }
-
-    function openMissionModal(defaultDay = 0) {
-      document.getElementById('task-id').value = '';
-      document.getElementById('task-title').value = '';
-      document.getElementById('task-desc').value = '';
-      document.getElementById('task-priority').value = 'medium';
-      document.getElementById('task-sector').value = 'navigation';
-      document.getElementById('task-day').value = defaultDay === 'today' ? ((new Date().getDay() + 6) % 7) : defaultDay;
-      
-      document.getElementById('modal-heading').textContent = 'Deploy Mission Directive';
-      document.getElementById('btn-submit-task').innerHTML = '<i data-lucide="rocket" class="w-4 h-4"></i> CONFIRM DIRECTIVE';
-      document.getElementById('btn-delete-task').classList.add('hidden');
-
-      // Clear subtasks
-      const subContainer = document.getElementById('subtasks-container');
-      subContainer.innerHTML = '';
-
-      document.getElementById('mission-modal').classList.remove('hidden');
-      lucide.createIcons();
-    }
-
-    function editMissionModal(id) {
-      const mission = missionState.missions.find(m => m.id === id);
-      if (!mission) return;
-
-      document.getElementById('task-id').value = mission.id;
-      document.getElementById('task-title').value = mission.title;
-      document.getElementById('task-desc').value = mission.desc || '';
-      document.getElementById('task-priority').value = mission.priority;
-      document.getElementById('task-sector').value = mission.sector;
-      document.getElementById('task-day').value = mission.day;
-
-      document.getElementById('modal-heading').textContent = 'Modify Mission Directives';
-      document.getElementById('btn-submit-task').innerHTML = '<i data-lucide="save" class="w-4 h-4"></i> UPDATE DIRECTIVE';
-      document.getElementById('btn-delete-task').classList.remove('hidden');
-
-      // Populate subtasks
-      const subContainer = document.getElementById('subtasks-container');
-      subContainer.innerHTML = '';
-      (mission.subtasks || []).forEach((st, idx) => {
-        addSubtaskInputRow(st.text, st.done);
-      });
-
-      document.getElementById('mission-modal').classList.remove('hidden');
-      lucide.createIcons();
-    }
-
-    function addSubtaskInputRow(text = '', isDone = false) {
-      const subContainer = document.getElementById('subtasks-container');
-      const row = document.createElement('div');
-      row.className = 'flex items-center space-x-2';
-      row.innerHTML = `
-        <input type="checkbox" ${isDone ? 'checked' : ''} class="subtask-done-check rounded border-white/20 text-stellar-cyan focus:ring-0">
-        <input type="text" value="${escapeHtml(text)}" placeholder="Step details..." class="subtask-text-input flex-1 px-3 py-1 rounded-lg glass-input text-xs font-sans text-white">
-        <button type="button" class="btn-remove-sub text-slate-500 hover:text-rose-400 p-1">
-          <i data-lucide="x" class="w-3.5 h-3.5"></i>
-        </button>
-      `;
-      row.querySelector('.btn-remove-sub').addEventListener('click', () => row.remove());
-      subContainer.appendChild(row);
-      lucide.createIcons();
-    }
-
-    function deleteCurrentModalMission() {
-      const id = document.getElementById('task-id').value;
-      if (!id) return;
-
-      missionState.missions = missionState.missions.filter(m => m.id !== id);
-      soundSynth.playAbortHum();
-      showToast('MISSION ABORTED', 'Directive purged from ship trajectory.');
-      closeMissionModal();
-      renderApp();
-    }
-
-    function closeMissionModal() {
-      document.getElementById('mission-modal').classList.add('hidden');
-    }
-
-    // 6. Telemetry & Analytics Update
-    function updateTelemetryMetrics() {
-      const total = missionState.missions.length;
-      const completed = missionState.missions.filter(m => m.completed).length;
-      const critical = missionState.missions.filter(m => m.priority === 'critical' && !m.completed).length;
-      const pending = total - completed;
-
-      const rate = total > 0 ? Math.round((completed / total) * 100) : 0;
-      const xp = completed * 85 + 120; // Simulated cosmic energy
-
-      // Stats DOM Elements
-      document.getElementById('stat-total').textContent = total;
-      document.getElementById('stat-completed').textContent = completed;
-      document.getElementById('stat-pending').textContent = pending;
-      document.getElementById('stat-critical').textContent = critical;
-      document.getElementById('stat-rate').textContent = `${rate}%`;
-      document.getElementById('stat-rate-bar').style.width = `${rate}%`;
-      document.getElementById('stat-xp').innerHTML = `${xp} <span class="text-xs font-normal">GW</span>`;
-
-      // Pilot Rank based on rate
-      let rank = 'Cadet';
-      if (completed >= 15) rank = 'Fleet Admiral';
-      else if (completed >= 8) rank = 'Commander';
-      else if (completed >= 3) rank = 'Astrogator';
-      document.getElementById('stat-pilot-rank').textContent = rank;
-
-      // Subtasks count calculation
-      let totalSub = 0;
-      let completedSub = 0;
-      missionState.missions.forEach(m => {
-        (m.subtasks || []).forEach(st => {
-          totalSub++;
-          if (st.done) completedSub++;
-        });
-      });
-      document.getElementById('metric-subtasks').textContent = `${completedSub} / ${totalSub}`;
-      document.getElementById('metric-velocity').textContent = `${completed} completed`;
-
-      // Render Sector Distribution Bars in Analytics View
-      renderSectorAnalytics();
-    }
-
-    function renderSectorAnalytics() {
-      const container = document.getElementById('sector-analytics-bars');
-      if (!container) return;
-
-      const total = missionState.missions.length || 1;
-      container.innerHTML = '';
-
-      Object.keys(SECTORS).forEach(secKey => {
-        const sec = SECTORS[secKey];
-        const count = missionState.missions.filter(m => m.sector === secKey).length;
-        const pct = Math.round((count / total) * 100);
-
-        const row = document.createElement('div');
-        row.innerHTML = `
-          <div class="flex justify-between items-center mb-1">
-            <span class="flex items-center gap-1.5 ${sec.color}">
-              <i data-lucide="${sec.icon}" class="w-3.5 h-3.5"></i>
-              ${sec.label}
-            </span>
-            <span class="text-slate-400">${count} missions (${pct}%)</span>
-          </div>
-          <div class="w-full bg-white/5 h-2 rounded-full overflow-hidden">
-            <div class="h-full ${sec.bg.replace('/15', '')} transition-all duration-500" style="width: ${pct}%"></div>
-          </div>
-        `;
-        container.appendChild(row);
-      });
-      lucide.createIcons();
-    }
-
-    // 7. Space Toast Notification Helper
-    let toastTimeout = null;
-    function showToast(title, message, iconName = 'radio') {
-      const banner = document.getElementById('toast-banner');
-      const titleElem = document.getElementById('toast-title');
-      const msgElem = document.getElementById('toast-msg');
-      const iconElem = document.getElementById('toast-icon');
-
-      titleElem.textContent = title;
-      msgElem.textContent = message;
-      iconElem.setAttribute('data-lucide', iconName);
-      lucide.createIcons();
-
-      banner.classList.remove('translate-y-24', 'opacity-0', 'pointer-events-none');
-      banner.classList.add('translate-y-0', 'opacity-100');
-
-      if (toastTimeout) clearTimeout(toastTimeout);
-      toastTimeout = setTimeout(() => {
-        banner.classList.add('translate-y-24', 'opacity-0', 'pointer-events-none');
-        banner.classList.remove('translate-y-0', 'opacity-100');
-      }, 3500);
-    }
-
-    // Safe HTML Escaper
-    function escapeHtml(str) {
-      if (!str) return '';
-      return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#039;');
-    }
-
-    // 8. Event Bindings & Lifecycle Init
-    window.addEventListener('DOMContentLoaded', () => {
-      // Initialize Starfield Canvas
-      initCanvas();
-      drawCosmicSky();
-      updateStardate();
-      setInterval(updateStardate, 60000);
-
-      // Render Initial State
-      renderApp();
-
-      // Audio Toggle Button
-      const audioBtn = document.getElementById('btn-toggle-audio');
-      const audioIcon = document.getElementById('audio-icon');
-      const audioLabel = document.getElementById('audio-status-label');
-      audioBtn.addEventListener('click', () => {
-        soundSynth.enabled = !soundSynth.enabled;
-        audioIcon.setAttribute('data-lucide', soundSynth.enabled ? 'volume-2' : 'volume-x');
-        if (audioLabel) audioLabel.textContent = soundSynth.enabled ? 'Active' : 'Muted';
-        audioBtn.classList.toggle('text-slate-500', !soundSynth.enabled);
-        audioBtn.classList.toggle('text-stellar-cyan', soundSynth.enabled);
-        lucide.createIcons();
-        showToast('AUDIO TELEMETRY', soundSynth.enabled ? 'Acoustic feedback enabled' : 'Acoustic telemetry muted');
-      });
-
-      // Week Navigation Controls
-      document.getElementById('btn-prev-week').addEventListener('click', () => {
-        missionState.currentWeekOffset--;
-        renderApp();
-      });
-      document.getElementById('btn-next-week').addEventListener('click', () => {
-        missionState.currentWeekOffset++;
-        renderApp();
-      });
-      document.getElementById('btn-current-week').addEventListener('click', () => {
-        missionState.currentWeekOffset = 0;
-        renderApp();
-      });
-
-      // View Switcher Tabs
-      const viewWeekBtn = document.getElementById('view-week-btn');
-      const viewTodayBtn = document.getElementById('view-today-btn');
-      const viewAnalyticsBtn = document.getElementById('view-analytics-btn');
-
-      const viewWeekContainer = document.getElementById('view-week-container');
-      const viewTodayContainer = document.getElementById('view-today-container');
-      const viewAnalyticsContainer = document.getElementById('view-analytics-container');
-
-      function switchView(viewName) {
-        missionState.activeView = viewName;
-
-        // Reset Tab active states
-        [viewWeekBtn, viewTodayBtn, viewAnalyticsBtn].forEach(btn => {
-          btn.className = 'px-3 py-1 text-xs font-mono font-medium rounded-lg text-slate-400 hover:text-slate-200 transition-all flex items-center gap-1.5';
-        });
-
-        // Hide all views
-        viewWeekContainer.classList.add('hidden');
-        viewTodayContainer.classList.add('hidden');
-        viewAnalyticsContainer.classList.add('hidden');
-
-        if (viewName === 'week') {
-          viewWeekBtn.className = 'px-3 py-1 text-xs font-mono font-medium rounded-lg bg-stellar-cyan/20 text-stellar-cyan border border-stellar-cyan/40 transition-all flex items-center gap-1.5';
-          viewWeekContainer.classList.remove('hidden');
-        } else if (viewName === 'today') {
-          viewTodayBtn.className = 'px-3 py-1 text-xs font-mono font-medium rounded-lg bg-stellar-cyan/20 text-stellar-cyan border border-stellar-cyan/40 transition-all flex items-center gap-1.5';
-          viewTodayContainer.classList.remove('hidden');
-        } else if (viewName === 'analytics') {
-          viewAnalyticsBtn.className = 'px-3 py-1 text-xs font-mono font-medium rounded-lg bg-stellar-cyan/20 text-stellar-cyan border border-stellar-cyan/40 transition-all flex items-center gap-1.5';
-          viewAnalyticsContainer.classList.remove('hidden');
-        }
-        renderApp();
-      }
-
-      viewWeekBtn.addEventListener('click', () => switchView('week'));
-      viewTodayBtn.addEventListener('click', () => switchView('today'));
-      viewAnalyticsBtn.addEventListener('click', () => switchView('analytics'));
-
-      // Deploy Mission Button in Header
-      document.getElementById('btn-new-mission').addEventListener('click', () => {
-        openMissionModal(0);
-      });
-
-      // Filter Inputs
-      document.getElementById('mission-search').addEventListener('input', (e) => {
-        missionState.searchQuery = e.target.value;
-        renderApp();
-      });
-
-      document.getElementById('filter-priority').addEventListener('change', (e) => {
-        missionState.filterPriority = e.target.value;
-        renderApp();
-      });
-
-      document.getElementById('filter-sector').addEventListener('change', (e) => {
-        missionState.filterSector = e.target.value;
-        renderApp();
-      });
-
-      document.getElementById('btn-reset-filters').addEventListener('click', () => {
-        document.getElementById('mission-search').value = '';
-        document.getElementById('filter-priority').value = 'all';
-        document.getElementById('filter-sector').value = 'all';
-        missionState.searchQuery = '';
-        missionState.filterPriority = 'all';
-        missionState.filterSector = 'all';
-        renderApp();
-        showToast('TELEMETRY RESET', 'All filters restored to default.');
-      });
-
-      // Modal Controls
-      document.getElementById('modal-close-btn').addEventListener('click', closeMissionModal);
-      document.getElementById('btn-cancel-modal').addEventListener('click', closeMissionModal);
-      document.getElementById('btn-delete-task').addEventListener('click', deleteCurrentModalMission);
-      document.getElementById('btn-add-subtask').addEventListener('click', () => addSubtaskInputRow());
-
-      // Form Submit
-      document.getElementById('mission-form').addEventListener('submit', (e) => {
-        e.preventDefault();
-
-        const id = document.getElementById('task-id').value;
-        const title = document.getElementById('task-title').value.trim();
-        const desc = document.getElementById('task-desc').value.trim();
-        const priority = document.getElementById('task-priority').value;
-        const sector = document.getElementById('task-sector').value;
-        const rawDay = document.getElementById('task-day').value;
-        const day = rawDay === 'backlog' ? 'backlog' : parseInt(rawDay, 10);
-
-        // Gather subtasks
-        const subRows = document.querySelectorAll('#subtasks-container > div');
-        const subtasks = [];
-        subRows.forEach(row => {
-          const text = row.querySelector('.subtask-text-input').value.trim();
-          const done = row.querySelector('.subtask-done-check').checked;
-          if (text) subtasks.push({ text, done });
-        });
-
-        if (!title) return;
-
-        if (id) {
-          // Edit existing
-          const existing = missionState.missions.find(m => m.id === id);
-          if (existing) {
-            existing.title = title;
-            existing.desc = desc;
-            existing.priority = priority;
-            existing.sector = sector;
-            existing.day = day;
-            existing.subtasks = subtasks;
-          }
-          showToast('DIRECTIVE UPDATED', `Parameters updated for ${title}`);
-        } else {
-          // Create new
-          const newMission = {
-            id: 'ms-' + Date.now(),
-            title,
-            desc,
-            day,
-            priority,
-            sector,
-            completed: false,
-            subtasks,
-            createdAt: Date.now()
-          };
-          missionState.missions.push(newMission);
-          soundSynth.playDeployBlip();
-          showToast('DIRECTIVE DEPLOYED', `Mission placed in orbital slot`);
-        }
-
-        closeMissionModal();
-        renderApp();
-      });
-
-      // Close modal on escape or backdrop click
-      window.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') closeMissionModal();
-      });
-
-      document.getElementById('mission-modal').addEventListener('click', (e) => {
-        if (e.target.id === 'mission-modal') closeMissionModal();
-      });
-    });
   </script>
 </body>
 </html>
